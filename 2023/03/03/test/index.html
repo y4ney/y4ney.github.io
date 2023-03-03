@@ -20,28 +20,33 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blog">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="0x00 概述0x01 引言  给软件中漏洞打补丁一直以来都是维护已经部署的代码的安全的一个重要的方向。在容器世界中，这任然一个具有相关性的问题。但是在这一章中，你会认识到打补丁的过程完全被重塑了。不过，首先我们来介绍一下，什么是软件中的漏洞以及他们是怎么被发布和跟踪的。 0x02 专业名词2.1 package、software和library Software（软件）：是指能够实现某种特定功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7.1漏洞研究">
+<meta property="og:url" content="http://example.com/2023/03/03/test/index.html">
 <meta property="og:site_name" content="Blog">
+<meta property="og:description" content="0x00 概述0x01 引言  给软件中漏洞打补丁一直以来都是维护已经部署的代码的安全的一个重要的方向。在容器世界中，这任然一个具有相关性的问题。但是在这一章中，你会认识到打补丁的过程完全被重塑了。不过，首先我们来介绍一下，什么是软件中的漏洞以及他们是怎么被发布和跟踪的。 0x02 专业名词2.1 package、software和library Software（软件）：是指能够实现某种特定功能">
 <meta property="og:locale">
+<meta property="article:published_time" content="2023-03-03T14:21:00.000Z">
+<meta property="article:modified_time" content="2023-03-03T14:43:00.119Z">
 <meta property="article:author" content="Yaney">
+<meta property="article:tag" content="漏洞">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2023/03/03/test/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh'
   };
 </script>
 
-  <title>Blog</title>
+  <title>7.1漏洞研究 | Blog</title>
   
 
 
@@ -164,9 +169,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
@@ -182,10 +188,9 @@
       <meta itemprop="name" content="Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/03/test/" class="post-title-link" itemprop="url">7.1漏洞研究</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          7.1漏洞研究
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -232,7 +237,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="0x00-概述"><a href="#0x00-概述" class="headerlink" title="0x00 概述"></a>0x00 概述</h1><h1 id="0x01-引言"><a href="#0x01-引言" class="headerlink" title="0x01 引言"></a>0x01 引言</h1><p>  给软件中漏洞打补丁一直以来都是维护已经部署的代码的安全的一个重要的方向。在容器世界中，这任然一个具有相关性的问题。但是在这一章中，你会认识到打补丁的过程完全被重塑了。不过，首先我们来介绍一下，什么是软件中的漏洞以及他们是怎么被发布和跟踪的。</p>
+        <h1 id="0x00-概述"><a href="#0x00-概述" class="headerlink" title="0x00 概述"></a>0x00 概述</h1><h1 id="0x01-引言"><a href="#0x01-引言" class="headerlink" title="0x01 引言"></a>0x01 引言</h1><p>  给软件中漏洞打补丁一直以来都是维护已经部署的代码的安全的一个重要的方向。在容器世界中，这任然一个具有相关性的问题。但是在这一章中，你会认识到打补丁的过程完全被重塑了。不过，首先我们来介绍一下，什么是软件中的漏洞以及他们是怎么被发布和跟踪的。</p>
 <h1 id="0x02-专业名词"><a href="#0x02-专业名词" class="headerlink" title="0x02 专业名词"></a>0x02 专业名词</h1><h2 id="2-1-package、software和library"><a href="#2-1-package、software和library" class="headerlink" title="2.1 package、software和library"></a>2.1 package、software和library</h2><ul>
 <li><strong>Software（软件）</strong>：是指能够实现某种特定功能的计算机程序或程序集合。软件包括各种不同的程序类型，如应用程序、操作系统、驱动程序、游戏等。它们通常由多个模块组成，这些模块可能来自不同的软件包或库。</li>
 <li><strong>Package（软件包）</strong>：软件包是指一组相关联的文件或模块，通常包括源代码、可执行文件、配置文件、文档和依赖项等。软件包可以包含一个或多个程序或库，它们可以在不同的操作系统和平台上进行安装和使用。软件包的设计旨在方便安装、升级和卸载软件。</li>
@@ -266,21 +271,26 @@
 <p>这些CVE编号被美国国家漏洞数据库（National Vulnerability Database，NVD）用来跟踪受漏洞影响的软件包和版本。</p>
 <h1 id="0x06-结语"><a href="#0x06-结语" class="headerlink" title="0x06 结语"></a>0x06 结语</h1><p>乍一看，你可能会认为这就是故事的结局：有一个受影响的所有软件包版本的列表，所以如果你有一个在受影响的软件包版本列表的软件，你就会被<strong>揭露（expose）</strong>，但不幸的是，它并没有那么简单，因为根据您使用的Linux发行版本，不同的Linux发行版本可能会有不同的软件包补丁版本。</p>
 <h1 id="0x07-总结"><a href="#0x07-总结" class="headerlink" title="0x07 总结"></a>0x07 总结</h1>
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
+          <div class="post-tags">
+              <a href="/tags/%E6%BC%8F%E6%B4%9E/" rel="tag"># 漏洞</a>
+          </div>
+
+        
+
+
+        
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 
@@ -333,6 +343,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">0x00 概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">0x01 引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-%E4%B8%93%E4%B8%9A%E5%90%8D%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">0x02 专业名词</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-package%E3%80%81software%E5%92%8Clibrary"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 package、software和library</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-issue%E3%80%81flaw%E5%92%8Cvulnerability"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 issue、flaw和vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Expose%E5%92%8CExploit"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 Expose和Exploit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-patch%E5%92%8Cfix"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 patch和fix</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-%E6%BC%8F%E6%B4%9E%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">4.</span> <span class="nav-text">0x03 漏洞是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-%E6%BC%8F%E6%B4%9E%E6%98%AF%E6%80%8E%E4%B9%88%E8%A2%AB%E5%85%AC%E5%B8%83%E7%9A%84"><span class="nav-number">5.</span> <span class="nav-text">0x04 漏洞是怎么被公布的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x05-%E6%BC%8F%E6%B4%9E%E6%98%AF%E6%80%8E%E6%A0%B7%E8%A2%AB%E8%BF%BD%E8%B8%AA%E7%9A%84"><span class="nav-number">6.</span> <span class="nav-text">0x05 漏洞是怎样被追踪的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-%E7%BB%93%E8%AF%AD"><span class="nav-number">7.</span> <span class="nav-text">0x06 结语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x07-%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">0x07 总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
