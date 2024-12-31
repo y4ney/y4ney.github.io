@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>为什么 Podman 比 Docker 更安全</title>
+    <url>/2024/12/31/%E4%B8%BA%E4%BB%80%E4%B9%88-Podman-%E6%AF%94-Docker-%E6%9B%B4%E5%AE%89%E5%85%A8/</url>
+    <content><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>今天，我们从日志审计的角度来讨论：为什么Podman 比Docker 更安全？</p>
+<ol>
+<li>在开启话题之前，我们需要了解 Linux的audit 日志审计功能和loginuid的基础知识。</li>
+<li>然后，分别使用Podman 和Docker来启动容器，解析他们运行着的容器中的loginuid的变化及原因。</li>
+<li>此外，我们还原了由于loginuid的变化所导致的攻击场景。</li>
+</ol>
+<p>本文所有的验证都在 ubuntu 22.04 之上进行，且登录用户为 yaney。</p>
+<p><img src="https://secure2.wostatic.cn/static/bwavzfoEbjbAzai31CkNyp/image.png?auth_key=1735630934-ehSm5CP3d4eigbch6prrJM-0-c6c917d3adbd4b2cbe2f4f967d7f3a36" alt="图1：操作的用户及系统信息"></p>
+<h2 id="0x01-Linux-的audit-审计功能"><a href="#0x01-Linux-的audit-审计功能" class="headerlink" title="0x01 Linux 的audit 审计功能"></a>0x01 Linux 的audit 审计功能</h2><p>在讨论<a href="https://podman.io/">Podman</a> 和Docker 的安全性之前，我们需要了解一些关于 Linux audit 审计功能的基础知识。</p>
+<p>Linux 内核有一个名为 audit 的安全功能，管理员可以通过该功能监视系统上的安全事件，并记录在本地的<code>audit.log</code> 文件中。此外，audit 日志还可以远程存储在其他主机上，以防攻击者试图掩盖其入侵的痕迹。</p>
+<p>我们以审计 <code>/etc/shadow</code> 文件上的操作为例进行说明。<code>/etc/shadow</code> 文件是一个常见的安全文件，攻击者可以向其中增加记录，从而重新获得系统的访问权限。</p>
+<p><img src="https://secure2.wostatic.cn/static/3ei8LEuAaQ2v7q5DzRkqeF/image.png?auth_key=1735630934-t8xC3xo2CqMvZ6mqSvNkge-0-d12a6063cedf4aa928ef32e2b75c2ec3" alt="图2：`/etc/shadow` 文件的操作及审计流程"></p>
+<ol>
+<li>如上图所示，左边图我们安装了auditd 软件包，并通过auditctl 写入规则，开始审计 <code>/etc/shadow</code> 文件。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> auditctl -w /etc/shadow</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>右边的图，我们切换到 root 用户身份，并通过下面命令，对目标文件进行操作。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/shadow</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>最后，我们使用audit所提供的工具ausearch来搜索近期与 <code>/etc/shadow</code> 文件相关的事件。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ausearch -f /etc/shadow -i -ts recent</span><br></pre></td></tr></table></figure>
+
+<p>一会儿时间，audit 就记录了许多信息，我们不需要去解读这些信息，只需关注一个问题，那就是：<strong>为什么audit能够记录是root用户（uid&#x3D;root）查看了</strong>**<code>/etc/shadow</code>**<strong>文件，且该进程的原始登录用户（auid&#x3D;yaney）是 yaney呢？</strong></p>
+<p><img src="https://secure2.wostatic.cn/static/oH9gPLz6eBcqr8vt6nPES3/image.png?auth_key=1735630934-etPkHfPz9hYxikCncQjvqV-0-4be7d6db3011c879220d96ac6c557361" alt="图3：audit 的审计日志"></p>
+<h2 id="0x02-loginuid"><a href="#0x02-loginuid" class="headerlink" title="0x02 loginuid"></a>0x02 loginuid</h2><p>要回答这个问题，我们不得不了解Linux 内核有个名为<code>loginuid</code>的属性了。</p>
+<p><code>loginuid</code>存储在虚拟文件系统<code>/proc/self/loginuid</code> 中，用来标识登录的用户。每当我们登录系统时，<code>loginuid</code>就被设置为用户的ID（UID），且内核不允许任何进程对他进行修改。</p>
+<p>此外，从该登录进程派生出来的所有子进程都会继承这个 <code>loginuid</code>，并形成一条“跟踪链”，这使得系统能够追踪到当前活动是由哪个登录用户发起的。例如：当我以 yaney 的身份进入系统时，<code>loginuid</code>的编号为1000；当我切换用户至 root 时，<code>loginuid</code>的编号还是1000。</p>
+<p><img src="https://secure2.wostatic.cn/static/3JWxni7ik4CSgtrbeYsWyu/image.png?auth_key=1735630934-4riY3YevwXP4tyZtk2Yptm-0-fe215547be7eeead8358f907a6fbb93f" alt="图4：登录进程所派生的子进程都会继承相同的loginuid"></p>
+<h2 id="0x03-Podman-和-Docker-容器中的loginuid差异"><a href="#0x03-Podman-和-Docker-容器中的loginuid差异" class="headerlink" title="0x03 Podman 和 Docker 容器中的loginuid差异"></a>0x03 Podman 和 Docker 容器中的loginuid差异</h2><p>众所周知，容器只是宿主机中一个特殊的进程，那么容器中的<code>loginuid</code>又是怎样的呢？</p>
+<p>我们分别用Podman 和 Docker 启动容器，发现Podman的容器正确记录了我们的<code>loginuid</code>，而 Docker 的容器记录的却<code>4294967295</code>。docker 所记录的这个数字并不是一个随机的数字，我们后面再说。</p>
+<p><img src="https://secure2.wostatic.cn/static/jqVwFTDAiEaydct5Fh3onr/image.png?auth_key=1735630934-a3MxbFtRhvi2BMQHy1s5TJ-0-cfaa6cc58102d5de6efc00f0c6c5769a" alt="图5：Podman 容器和 Docker 容器中的loginuid的差异"></p>
+<p>那么，造成这种差异的原因又是什么呢？</p>
+<p>Podman 使用的是传统的fork&#x2F;exec 模型，即Podman 调用 <code>fork</code>系统调用来创建一个子进程，这个子进程几乎完全复制了父进程的状态，与父进程共享相同的内存内容。子进程创建后，再调用 <code>exec</code>或<code>execve</code>来替换自己的代码和数据。因此Podman容器进程是Podman的后代，podman 容器中的<code>loginuid</code>与宿主机上的<code>loginuid</code>完全一致。</p>
+<p>而Docker使用的是C&#x2F;S 模型。当我们执行 docker 命令时，本质上是Docker 客户端工具向Docker 守护进程（dockerd）发送请求，Docker 守护进程来处理与客户端工具的stdin&#x2F;stdout 通信并创建容器。所以 Docker 容器是 Docker 守护进程的后代，需要与守护进程的<code>loginuid</code> 一致。</p>
+<p>前面我们说了Docker 容器的<code>loginuid</code> 并不是一个随机数，那是因为Docker守护进程是init系统的子进程，它的<code>loginuid</code>是未经过设置的默认值，具体为32位无符号整数的最大值<code>0xFFFFFFFF</code>、十进制的<code>4294967295</code>。这种情况，audit一般会将<code>auid</code> 设置为 <code>unset</code>表示该进程无法关联到登录用户。我们可以查看dockerd 或systemd的<code>loginuid</code>来进行验证。</p>
+<ol>
+<li>查看dockerd 和systemd的进程ID（systemd的进程ID一般为1）。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ps -eo pid,uid,<span class="built_in">comm</span> | egrep <span class="string">&#x27;dockerd|systemd&#x27;</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>查看dockerd 和systemd 的 loginuid。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/[pid]/loginuid</span><br></pre></td></tr></table></figure>
+
+<p>如下图所示，dockerd 和systemd的loginuid 都是默认值<code>4294967295</code>。</p>
+<p><img src="https://secure2.wostatic.cn/static/d3f5b4hep5fSKGHTRTZwpY/image.png?auth_key=1735630934-n2DkHFEpf9ZTDXiJPeNsQU-0-dff8323a5736a4d65569e83bf5a0390d" alt="图6：查看dockerd 或systemd的loginuid"></p>
+<h2 id="0x03-攻击案例"><a href="#0x03-攻击案例" class="headerlink" title="0x03 攻击案例"></a>0x03 攻击案例</h2><p>那么，如果我们通过启动Podman容器和 Docker 容器来修改 <code>/etc/shadow</code> 文件，audit记录下来的日志又有什么区别呢？我们先来看看 Docker容器的。</p>
+<ol>
+<li>启动一个可交互的临时的特权容器，并将宿主机的根目录挂在到容器的 <code>/host</code> 目录中。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker run -it --<span class="built_in">rm</span> --privileged -v /:/host alpine sh</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>向宿主机的<code>/etc/shadow</code> 文件写入数据。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;docker,miao~&#x27;</span> | <span class="built_in">tee</span> -a /host/etc/shadow &gt; /dev/null</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>我们使用audit所提供的工具ausearch来搜索近期与 <code>/etc/shadow</code> 文件相关的事件。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ausearch -f /etc/shadow -i -ts recent</span><br></pre></td></tr></table></figure>
+
+<p>如下图所示，audit可以记录<code>/etc/shadow</code> 文件被修改了，但是不知道是谁修改的（auid&#x3D;unset）。在真实的业务环境中，如果攻击者随后删除了该Docker容器，那么我们根本无法从海量的数据中准确找到修改<code>/etc/shadow</code> 文件的痕迹。</p>
+<p><img src="https://secure2.wostatic.cn/static/dpmCsDuRdgLZ23Mb6R2HeC/image.png?auth_key=1735630934-vqtt1anVqp7aj1A6gyvFi5-0-6eda4894717944338af096ab2b55c2de" alt="图7：通过 docker 容器修改宿主机的 /etc/shodow 文件，audit 所记录的日志内容"></p>
+<p>接下来，我们来看看相同场景下，Podman的表现如何。Podman由于使用传统的 fork&#x2F;exec模型，因此可以正确记录所有内容。</p>
+<p><img src="https://secure2.wostatic.cn/static/6w7Gzmys2CRBxVqjcMR3BU/image.png?auth_key=1735630934-fh8UPGmoCkHdV84rffcMpQ-0-1ba5bdc69eb949a03bcb5e4ef14df3f3" alt="图8：通过 podman 容器修改宿主机的 /etc/shodow 文件，audit 所记录的日志内容"></p>
+<p>最后我们看到<code>/etc/shadow</code> 都被写入了恶意数据。虽然这只是关于<code>/etc/shadow</code> 文件的一个简单的操作，但有的安全产品底层会使用audit来分析进程上的恶意行为，所以为了保持更好的安全性，我们推荐使用基于 fork&#x2F;exec 启动容器的运行时而不是基于 C&#x2F;S 启动容器的运行时。</p>
+<p><img src="https://secure2.wostatic.cn/static/KC5ipY2UA9YEiBeaygdjQ/image.png?auth_key=1735630934-aCkwzFM3MSebcSJkZc6zvp-0-1beea1883f1326c88c14f9fe685e5856" alt="图9： /etc/shodow 被写入了恶意的数据"></p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>基于fork&#x2F;exec 模型的容器运行时还有很多其他非常不错的功能，例如systemd的<code>SD_NOTIFY</code>功能和套接字激活（Socket Activation）功能。</p>
+<p>若我们将podman 命令放入systemd unit文件中，容器进程可以通过Podman 向systemd返回通知，表明容器已准备好并且可以接受来自外部的请求或流量。SD_NOTIFY功能可以提高服务的启动效率，避免竞态条件并更加精确地对服务进行管理。</p>
+<p>此外，我们还可以将连接的套接字从 systemd 传递到 Podman，再传递到容器进程。这样一来，容器无需独立处理网络连接，只需要通过systemd就可以直接响应外部网络请求，减少额外的显式配置。</p>
+<p>当然，从安全的角度来看，fork&#x2F;exec 模型的运行时最好的功能就是：<strong>无需root权限即可运行容器</strong>。而类似Docker 这种采用C&#x2F;S 模型的运行时需要用户打开一个套接字，以root权限运行守护进程来启动容器。这样一来，我们只能依赖守护进程中所实现的安全机制，若守护进程存在安全风险，攻击者可以直接影响到主机操作系统的安全性。</p>
+]]></content>
+  </entry>
+</search>
