@@ -1,0 +1,663 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="容器环境通过前所未有的速度改变了应用程序开发，但这并非没有代价。使用现成的第三方容器镜像和开源代码可以大大加快开发周期，但也促成了应用程序中漏洞的引入。一个容器可能有数百个漏洞；更复杂的应用程序环境可能达到数万个漏洞。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用 Risk Spotlight 消除噪音并优先处理真正重要的漏洞">
+<meta property="og:url" content="http://example.com/2025/08/05/%E5%88%A9%E7%94%A8-Risk-Spotlight-%E6%B6%88%E9%99%A4%E5%99%AA%E9%9F%B3%E5%B9%B6%E4%BC%98%E5%85%88%E5%A4%84%E7%90%86%E7%9C%9F%E6%AD%A3%E9%87%8D%E8%A6%81%E7%9A%84%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="容器环境通过前所未有的速度改变了应用程序开发，但这并非没有代价。使用现成的第三方容器镜像和开源代码可以大大加快开发周期，但也促成了应用程序中漏洞的引入。一个容器可能有数百个漏洞；更复杂的应用程序环境可能达到数万个漏洞。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/image_l8jh8jhaa9.png">
+<meta property="og:image" content="http://example.com/image/image_swqcLqVpfO.png">
+<meta property="og:image" content="http://example.com/image/image_n19hGiyhg1.png">
+<meta property="og:image" content="http://example.com/image/image_935aozXuii.png">
+<meta property="og:image" content="http://example.com/image/image_nbY_MArxvx.png">
+<meta property="article:published_time" content="2025-08-04T16:11:24.000Z">
+<meta property="article:modified_time" content="2025-08-04T16:14:09.028Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="容器安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/image_l8jh8jhaa9.png">
+  
+  
+  
+  <title>利用 Risk Spotlight 消除噪音并优先处理真正重要的漏洞 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/cybersecurity.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="利用 Risk Spotlight 消除噪音并优先处理真正重要的漏洞"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-08-05 00:11" pubdate>
+          2025年8月5日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">利用 Risk Spotlight 消除噪音并优先处理真正重要的漏洞</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>你的团队是否被容器镜像的漏洞信息淹没？你是否花费了大量时间确定在哪里集中资源去修复漏洞，但仍然错过了危险的漏洞？请知道，你并不孤单。</p>
+<p>容器环境通过前所未有的速度改变了应用程序开发，但这并非没有代价。使用现成的第三方容器镜像和开源代码可以大大加快开发周期，但也促成了应用程序中漏洞的引入。一个容器可能有数百个漏洞；更复杂的应用程序环境可能达到数万个漏洞。</p>
+<h2 id="0x01-背景：容器漏洞过载日益成为一个挑战"><a href="#0x01-背景：容器漏洞过载日益成为一个挑战" class="headerlink" title="0x01 背景：容器漏洞过载日益成为一个挑战"></a>0x01 背景：容器漏洞过载日益成为一个挑战</h2><p>情况并未好转，特别是<a target="_blank" rel="noopener" href="https://www.cvedetails.com/browse-by-date.php">2016 年至 2017 年，新的漏洞数量增加了将近两倍</a>。</p>
+<p><img src="/image/image_l8jh8jhaa9.png" srcset="/img/loading.gif" lazyload alt="图 1：每年的 CVE 漏洞数量 图 1：每年的 CVE 漏洞数量 " title="图 1： 每年的CVE漏洞数量 图 1： 每年的CVE漏洞数量 "></p>
+<p>据美国网络安全与基础设施安全局（CISA）报告：<a target="_blank" rel="noopener" href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-040a">软件漏洞在 2021 年勒索软件事件的初始感染途径中仍然位列前三</a>。因此，及时发现和修复漏洞对于防止安全漏洞至关重要。</p>
+<p><img src="/image/image_swqcLqVpfO.png" srcset="/img/loading.gif" lazyload alt="图 2:2021 Trends Show Increased Globalized Threat of Ransomware 图 2:2021 Trends Show Increased Globalized Threat of Ransomware " title="图2：2021 Trends Show Increased Globalized Threat of Ransomware 图2：2021 Trends Show Increased Globalized Threat of Ransomware "></p>
+<p>在容器的世界中，管理漏洞已经变成了一个复杂的平衡风险、有限资源和对开发的影响的方程式。修复所有问题既不现实也没必要。并非所有漏洞都会带来风险，但找出那些不能等待，需要立即修复的漏洞却像是大海捞针一样困难。</p>
+<p>DevOps 和安全团队都知道，向开发人员提供一长串漏洞是行不通的，但将应用程序暴露给攻击者也不是一个好的选项。开发人员想知道的是，哪些漏洞需要优先处理，立即采取行动。</p>
+<h2 id="0x02-问题：现有的优先级划分方法并不有效"><a href="#0x02-问题：现有的优先级划分方法并不有效" class="headerlink" title="0x02 问题：现有的优先级划分方法并不有效"></a>0x02 问题：现有的优先级划分方法并不有效</h2><p>人们通常通过 CVSS 分数定义的威胁等级来减少漏洞负载，但是这种方法存在非常严重的缺陷。即使修复了高危和严重级别的漏洞，漏洞的负载也不会减少到可管理的范围之内，因为漏洞的数量远远超过了团队的处理能力，团队需要进一步确定漏洞的处理优先级。但认识到 CVSS 分数可能会产生误导也很重要。</p>
+<p>安全研究员 Miguel Hernández 在他的博客《<a target="_blank" rel="noopener" href="https://sysdig.com/blog/vulnerability-score-cvss-meaning/">Are vulnerability scores misleading you? Understanding CVSS score</a>》中说到：高危漏洞可能只是噪音，它不会对您的应用程序造成任何实际的风险。而中危漏洞可能会给攻击者提供切入点，从而演变成广泛且有危害的影响。因此，仅根据 CVSS 分数确定优先级是低效的，甚至是无效的。</p>
+<p>其他的漏洞优先级方法会尝试采用一些额外的风险因素，但这同样无法解决漏洞过载的问题，因为它们无法判断一些漏洞会不会对具体的环境造成一些实际的风险，无法消除漏洞中的噪音。</p>
+<h2 id="0x03-原理：Risk-Spotlight-消除噪音并自动发现真正重要的漏洞"><a href="#0x03-原理：Risk-Spotlight-消除噪音并自动发现真正重要的漏洞" class="headerlink" title="0x03 原理：Risk Spotlight 消除噪音并自动发现真正重要的漏洞"></a>0x03 原理：Risk Spotlight 消除噪音并自动发现真正重要的漏洞</h2><p><strong>容器镜像漏洞报告中的大多数漏洞实际上都是噪音。</strong> 因为容器中包含着许多从未被使用过的软件包。即使这些软件包从未被使用过，但是仍然会在漏洞扫描报告中。</p>
+<p><strong>漏洞的可利用性是是否造成实际的风险的关键决定因素。</strong> 如果漏洞从未被暴露出来，那么该漏洞就不会提供被利用的机会，也不会带来实际的风险，容器运行的过程中不活跃的软件包中的漏洞也只是噪音。</p>
+<p>那么如何判断哪些容器已经被暴露出来并会构成真正的风险呢？Sysdig 提出，可以使用<strong>运行时智能</strong>来解决该问题。</p>
+<p><img src="/image/image_n19hGiyhg1.png" srcset="/img/loading.gif" lazyload alt="图 3：使用运行时智能来消除容器镜像中的漏洞噪音 图 3：使用运行时智能来消除容器镜像中的漏洞噪音 " title="图3：使用运行时智能来消除容器镜像中的漏洞噪音 图3：使用运行时智能来消除容器镜像中的漏洞噪音 "></p>
+<p>Sysdig 可以通过观测容器中的系统调用来准确识别运行时加载的软件包，消除容器漏洞优先级中对漏洞可利用性的猜测。通过了解暴露的内容和未暴露的内容，Risk Spotlight 消除了噪音和优先级猜测，以便团队可以专注于迫不及待的真正重要问题。</p>
+<h2 id="0x04-解决方案：了解使用-Sysdig-如何快速、轻松地识别哪些漏洞构成真正的风险"><a href="#0x04-解决方案：了解使用-Sysdig-如何快速、轻松地识别哪些漏洞构成真正的风险" class="headerlink" title="0x04 解决方案：了解使用 Sysdig 如何快速、轻松地识别哪些漏洞构成真正的风险"></a>0x04 解决方案：了解使用 Sysdig 如何快速、轻松地识别哪些漏洞构成真正的风险</h2><p>如果向 DevOps 和安全团队发送一份包含数百个漏洞的报告，那么可能是没有用的，因为在不消除噪音的情况下，对漏洞进行优先级排序是无效的。如果只有少数的几个漏洞会给攻击者提供真正的利用的机会，那么为什么要让您的团队承担不构成风险的漏洞呢？</p>
+<p><img src="/image/image_935aozXuii.png" srcset="/img/loading.gif" lazyload alt="图 4：云原生的工作负载中包含大量的漏洞 图 4：云原生的工作负载中包含大量的漏洞 " title="图4：云原生的工作负载中包含大量的漏洞 图4：云原生的工作负载中包含大量的漏洞 "></p>
+<p>借助 Risk Spotlight，您可以取消一些漏洞的修复优先级，并将修复工作的重心放在会直接构成风险的漏洞上，从而可以使用最少的资源更快的修复更重要的漏洞。</p>
+<p><img src="/image/image_nbY_MArxvx.png" srcset="/img/loading.gif" lazyload alt="图 5：借助 Risk Spotlight 筛选出需要优先修复的漏洞 图 5：借助 Risk Spotlight 筛选出需要优先修复的漏洞 " title="图5：借助Risk Spotlight 筛选出需要优先修复的漏洞 图5：借助Risk Spotlight 筛选出需要优先修复的漏洞 "></p>
+<h2 id="0x05-总结：风险聚焦的主要好处"><a href="#0x05-总结：风险聚焦的主要好处" class="headerlink" title="0x05 总结：风险聚焦的主要好处"></a>0x05 总结：风险聚焦的主要好处</h2><p>更多信息请观看 Youtobe 视频：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=9HIhQcrBRKM">Reducing vulnerability noise with Sysdig</a>，总的来说，风险聚焦的好处有：</p>
+<ul>
+<li><strong>将漏洞噪音减少高达 95%</strong>。Risk Spotlight 通过识别运行时未使用的包来消除不会立即造成风险的漏洞带来的干扰。</li>
+<li><strong>通过可行的见解来管理风险</strong>。Risk Spotlight 提供丰富的漏洞详细信息，例如来自多个来源的 CVSS 向量、漏洞修复版本和公开可用漏洞的链接，Risk Spotlight 还提供了以软件包为中心的视图，有助于大规模修复和管理漏洞风险。</li>
+<li><strong>对容器从源到运行的全面漏洞管理</strong>。Risk Spotlight 提供了整个容器生命周期（从构建到运行时）的漏洞风险的单一视图。开发人员可以立即采取行动，以缓解构成真正风险的少数漏洞，并通过在构建过程中删除未使用的包来尽早应用安全最佳实践。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AE%B9%E5%99%A8%E5%AE%89%E5%85%A8/" class="print-no-link">#容器安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>利用 Risk Spotlight 消除噪音并优先处理真正重要的漏洞</div>
+      <div>http://example.com/2025/08/05/利用-Risk-Spotlight-消除噪音并优先处理真正重要的漏洞/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年8月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/30/%E5%A6%82%E4%BD%95%E5%83%8F%E9%AB%98%E6%89%8B%E4%B8%80%E6%A0%B7%E6%8F%90%E9%97%AE/" title="如何像高手一样提问">
+                        <span class="hidden-mobile">如何像高手一样提问</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

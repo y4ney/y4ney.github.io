@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="今年的 fwd:cloudsec 2025 于 6 月 30 日至 7 月 1 日在美国丹佛举行，来自 AWS、Google、WIZ、CrowdStrike、Datadog 等一线厂牌的攻防专家们齐聚一堂，分享最新研究与实战经验。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fwd:cloudsec 2025：会议演讲总结">
+<meta property="og:url" content="http://example.com/2025/08/01/fwd-cloudsec-2025%EF%BC%9A%E4%BC%9A%E8%AE%AE%E6%BC%94%E8%AE%B2%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="今年的 fwd:cloudsec 2025 于 6 月 30 日至 7 月 1 日在美国丹佛举行，来自 AWS、Google、WIZ、CrowdStrike、Datadog 等一线厂牌的攻防专家们齐聚一堂，分享最新研究与实战经验。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/692.webp">
+<meta property="article:published_time" content="2025-08-01T11:28:02.000Z">
+<meta property="article:modified_time" content="2025-08-05T10:21:52.109Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="云安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/692.webp">
+  
+  
+  
+  <title>fwd:cloudsec 2025：会议演讲总结 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/692.webp') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="fwd:cloudsec 2025：会议演讲总结"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-08-01 19:28" pubdate>
+          2025年8月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">fwd:cloudsec 2025：会议演讲总结</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>每年全球有成百上千场安全会议，但真正专注云安全实战的，却屈指可数。而<a target="_blank" rel="noopener" href="https://fwdcloudsec.org/conference/north-america/" title="fwd:cloudsec">fwd:cloudsec</a>，就是其中少有的、由社区主导、内容高度聚焦的高质量会议。</p>
+<p>今年的 fwd:cloudsec 2025 于 6 月 30 日至 7 月 1 日在美国丹佛举行，来自 AWS、Google、WIZ、CrowdStrike、Datadog 等一线厂牌的攻防专家们齐聚一堂，分享最新研究与实战经验。</p>
+<p><img src="/image/693.webp" srcset="/img/loading.gif" lazyload alt="图 1：赞助商"></p>
+<p>fwd:cloudsec 是一个专注于云安全领域的非营利性会议，由 Forward CloudSec Association 组织举办，旨在为真实的云安全从业者提供一个独立、实践导向的平台。</p>
+<p>若您无法参加会议，也不用担心。Cybr 已经整理了<strong>43 场会议演讲的详细摘要</strong>，内容包括：</p>
+<ul>
+<li>快速理解的高层概览；</li>
+<li>关键要点和可执行见解；</li>
+<li>技术实现细节及具体示例；</li>
+<li>用于深入学习的完整演讲记录；</li>
+<li>原始 YouTube 演讲的直接链接。</li>
+</ul>
+<p><img src="/image/694.webp" srcset="/img/loading.gif" lazyload alt="图 2：会议材料"></p>
+<blockquote>
+<p>点击<a target="_blank" rel="noopener" href="https://github.com/Cybr-Inc/fwdcloudsec-2025-summaries">会议材料</a>，直接获取资料。</p>
+</blockquote>
+<h2 id="0x01-演讲内容概览"><a href="#0x01-演讲内容概览" class="headerlink" title="0x01 演讲内容概览"></a>0x01 演讲内容概览</h2><h3 id="类别一：AI-ML-安全"><a href="#类别一：AI-ML-安全" class="headerlink" title="类别一：AI&#x2F;ML 安全"></a>类别一：AI&#x2F;ML 安全</h3><p>AI 与安全的交叉成为热门话题，共有 7 场演讲：</p>
+<ol>
+<li>攻破 AI Agents：利用预设提示模板接管 Amazon Bedrock Agents</li>
+<li>通过提示格式绕过 AI 安全控制</li>
+<li>“AI 即服务”中的日志记录挑战</li>
+<li>双面间谍：揭露 AI Agent 平台中的隐藏威胁</li>
+<li>和误报说再见：构建值得信赖的 IaC 分析 AI</li>
+<li>微软如何应对云驱动的深度伪造威胁</li>
+<li>驯服 LLM，用于检测云审计日志中的异常</li>
+</ol>
+<h3 id="类别二：身份与访问管理-IAM"><a href="#类别二：身份与访问管理-IAM" class="headerlink" title="类别二：身份与访问管理 IAM"></a>类别二：身份与访问管理 IAM</h3><p>IAM 仍然是云安全中最棘手的问题，这一主题的演讲数量最多，共有 15 场演讲：</p>
+<ol>
+<li>ECS-cape：劫持 Amazon ECS 中的 IAM 权限</li>
+<li>快乐小云：用微软云和身份数据“画画”</li>
+<li>I SPy：重新思考 Entra ID 的研究，发掘获取全局管理员的新路径</li>
+<li>IAM Roles Anywhere + Let’s Encrypt：让人人都能用</li>
+<li>无 IP 也能搞事：绕过 IAP 进行数据外泄</li>
+<li>不那么秘密：GitHub Actions Secrets 的隐藏风险</li>
+<li>Workload Identity 实践：将 SPIFFE 用在生产环境</li>
+<li>为现代 Entra 环境重构 ROADRecon</li>
+<li>保护远程 MCP 服务器</li>
+<li>在 Office 365 中保持隐秘</li>
+<li>AWS IAM 的双面性</li>
+<li>虚假的安全感：防御如何变成漏洞</li>
+<li>信任问题：这些 JSON 文件到底代表什么？</li>
+<li>如果能用水晶球预测 IAM 会问什么？</li>
+<li>当你的云伙伴背叛你：云中信任关系被攻破</li>
+</ol>
+<h3 id="类别三：威胁狩猎与检测"><a href="#类别三：威胁狩猎与检测" class="headerlink" title="类别三：威胁狩猎与检测"></a>类别三：威胁狩猎与检测</h3><p>专注于识别与发现威胁，共有 3 场演讲：</p>
+<ol>
+<li>发现不可见：设备环境中的威胁狩猎</li>
+<li>猎人心法：一年云端威胁狩猎经验总结</li>
+<li>“资源未找到”？搞懂 GCP 错误码用于应急响应和检测</li>
+</ol>
+<h3 id="类别四：攻击技术与漏洞"><a href="#类别四：攻击技术与漏洞" class="headerlink" title="类别四：攻击技术与漏洞"></a>类别四：攻击技术与漏洞</h3><p>理解攻击者的视角，共有 3 场演讲：</p>
+<ol>
+<li>防守者讨厌这招：用一个“怪招”搞定易受攻击的 SaaS 应用</li>
+<li>一次打三家 CSP：一个漏洞带来的好、坏与丑</li>
+<li>whoAMI：发现并利用 AMI 名称混淆大规模攻击</li>
+</ol>
+<h3 id="类别五：云架构与基础设施"><a href="#类别五：云架构与基础设施" class="headerlink" title="类别五：云架构与基础设施"></a>类别五：云架构与基础设施</h3><p>实战指南与架构经验，共有 13 场演讲：</p>
+<ol>
+<li>超越三巨头：掌握 Oracle Cloud 在多云环境下的安全实践</li>
+<li>大型 AWS 环境中实施出口控制的挑战</li>
+<li>数据边界策略实践：SCP 与 RCP 的落地经验</li>
+<li>“我没注册这个”：解读 Google Artifact Registry 的真实内容</li>
+<li>引入 GRC 工程：开启 AWS 合规新纪元</li>
+<li>邀请者威胁：新型云部署模型下的安全管理</li>
+<li>企业合并收购期间，如何保障云环境安全</li>
+<li>日志没你想的有用：解析 IaC 中的身份归属</li>
+<li>ML 和 LLMOps 部署安全：平台架构师的引入经验</li>
+<li>GPU 共享安全：<a target="_blank" rel="noopener" href="http://fly.io/" title="Fly.io">Fly.io</a> 的经验总结</li>
+<li>好的、坏的和漏洞百出的 GCP 租户项目解析</li>
+<li>这工作不是我报名的：从零构建生产级 AWS 环境</li>
+<li>你不是 Netflix：如何正确借鉴大会演讲内容</li>
+</ol>
+<h3 id="其它：开场与闭幕（2-场演讲）"><a href="#其它：开场与闭幕（2-场演讲）" class="headerlink" title="其它：开场与闭幕（2 场演讲）"></a>其它：开场与闭幕（2 场演讲）</h3><p>作为大会的收尾，为与会者提供背景与幕后花絮。我特别喜欢这种透明感。</p>
+<h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><p>很多大会的演讲其实都很有料，但说实话，大多数人根本挤不出 20 分钟去一场场点开看。更尴尬的是——你压根不知道讲的内容是不是你关心的方向。</p>
+<p>我们找到了这份 fwd:cloudsec 2025 的演讲资料，希望能帮你<strong>快速判断哪些值得点开深入看，哪些可以先跳过</strong>，节省时间、直奔干货。</p>
+<p>如果你觉得这份整理对你有帮助，也欢迎转发给朋友一起看，让更多人少踩坑、多吸收点实战知识！</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%BA%91%E5%AE%89%E5%85%A8/" class="print-no-link">#云安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>fwd:cloudsec 2025：会议演讲总结</div>
+      <div>http://example.com/2025/08/01/fwd-cloudsec-2025：会议演讲总结/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年8月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/30/%E5%A6%82%E4%BD%95%E5%83%8F%E9%AB%98%E6%89%8B%E4%B8%80%E6%A0%B7%E6%8F%90%E9%97%AE/" title="如何像高手一样提问">
+                        <span class="hidden-mobile">如何像高手一样提问</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

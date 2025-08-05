@@ -1,0 +1,757 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="风险与威胁有什么区别？缓解措施和它们又有什么关系呢？在对容器进行威胁建模之前，我们先简单说明一下风险、威胁及缓解措施的基本概念。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.1 风险、威胁和缓解措施">
+<meta property="og:url" content="http://example.com/2024/06/11/1-1-%E9%A3%8E%E9%99%A9%E3%80%81%E5%A8%81%E8%83%81%E5%92%8C%E7%BC%93%E8%A7%A3%E6%8E%AA%E6%96%BD/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="风险与威胁有什么区别？缓解措施和它们又有什么关系呢？在对容器进行威胁建模之前，我们先简单说明一下风险、威胁及缓解措施的基本概念。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/8131713496802_.pic_hd.png">
+<meta property="article:published_time" content="2024-06-11T03:58:35.000Z">
+<meta property="article:modified_time" content="2025-08-05T05:22:01.789Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="容器安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/8131713496802_.pic_hd.png">
+  
+  
+  
+  <title>1.1 风险、威胁和缓解措施 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/8131713496802_.pic_hd.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="1.1 风险、威胁和缓解措施"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-11 11:58" pubdate>
+          2024年6月11日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          988 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">1.1 风险、威胁和缓解措施</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>风险与威胁有什么区别？缓解措施和它们又有什么关系呢？在对容器进行威胁建模之前，我们先简单说明一下风险、威胁及缓解措施的基本概念。</p>
+<h2 id="0x01-定义"><a href="#0x01-定义" class="headerlink" title="0x01 定义"></a>0x01 定义</h2><p>首先，我们来看一下定义：</p>
+<ul>
+<li>风险（Risk）：潜在的问题，以及如果问题发生会造成的影响。</li>
+<li>威胁（Threat）：导致风险发生的途径。</li>
+<li>缓解措施（Mitigation）：对威胁的应对措施，即：你可以采取的可以用来防止威胁或至少降低其成功的可能性。</li>
+</ul>
+<p><img src="/image/image_bNAqfZU-KV.png" srcset="/img/loading.gif" lazyload alt="图 1：风险、威胁和缓解措施之间的关系" title="图1：风险、威胁和缓解措施之间的关系"></p>
+<p>假设一个情景：<strong>有人从你家偷走了车钥匙</strong>。那么：</p>
+<ul>
+<li>风险（Risk）：你的车可能会被开走。</li>
+<li>威胁（Threat）：偷取钥匙的不同的方式，例如：打破窗户伸手拿；用鱼竿将它钓走；敲门分散你的注意力，同时帮凶迅速溜进家中拿走钥匙。</li>
+<li>缓解措施（Mitigation）：让车钥匙不要离开你的视线。</li>
+</ul>
+<p><img src="/image/image_kxpNkk_vNI.png" srcset="/img/loading.gif" lazyload alt="图 2：若车钥匙被偷走了，其风险、威胁和缓解措施所对应的事项" title="图2：若车钥匙被偷走了，其风险、威胁和缓解措施所对应的事项"></p>
+<h2 id="0x02-风险之间的差异"><a href="#0x02-风险之间的差异" class="headerlink" title="0x02 风险之间的差异"></a>0x02 风险之间的差异</h2><p><strong>风险因组织而异</strong>：</p>
+<ul>
+<li>对于银行而言，风险是资金被盗取；</li>
+<li>对于电商而言，风险是交期被欺诈；</li>
+<li>对于经营博客的个人开发者而言，风险是别人入侵他们的网站并且发布不当言论。</li>
+</ul>
+<p><strong>风险不仅因国家之间的隐私法规不同而不同，还因地理位置不同而不同</strong>：</p>
+<ul>
+<li>在许多国家，泄露客户个人数据仅会损害声誉，</li>
+<li>而在欧洲，<a target="_blank" rel="noopener" href="https://www.atlassian.com/zh/trust/compliance/resources/gdpr" title="通用数据保护条例（General Data Protection Regulation ，GDPR）"><strong>通用数据保护条例（General Data Protection Regulation，GDPR）</strong></a><a target="_blank" rel="noopener" href="https://www.atlassian.com/zh/trust/compliance/resources/gdpr" title="允许的罚款高达公司总收入的4%">允许的罚款高达公司总收入的 4%</a>。</li>
+</ul>
+<p><img src="/image/image_DktmbcMTiw.png" srcset="/img/loading.gif" lazyload alt="图 3：维基百科上对于 通用数据保护条例 的介绍" title="图3：维基百科上对于 通用数据保护条例 的介绍"></p>
+<p>2019 年 7 月，CSO 统计了因数据泄漏或不遵守安全法而处以的最高罚款的事件，截止至 2024 年 4 月 26 日共有 15 起，这份<a target="_blank" rel="noopener" href="https://www.csoonline.com/article/567531/the-biggest-data-breach-fines-penalties-and-settlements-so-far.html" title="名单">名单</a>会随着相关处罚的新闻出现而持续更新。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>公司</th>
+<th>金额</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Meta（Facebook）</td>
+<td>13 亿美元</td>
+</tr>
+<tr>
+<td>2</td>
+<td>滴滴</td>
+<td>11.9 亿美元</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Amazon</td>
+<td>8.77 亿美元</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Equifax</td>
+<td>5.75 亿美元（至少）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Meta（Facebook、Instagram）</td>
+<td>4.13 亿美元</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Instagram</td>
+<td>4.03 亿美元</td>
+</tr>
+<tr>
+<td>7</td>
+<td>TikTok</td>
+<td>3.7 亿美元</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T-Mobile</td>
+<td>3.5 亿美元</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Meta（Facebook）</td>
+<td>2.77 亿美元</td>
+</tr>
+<tr>
+<td>10</td>
+<td>WhatsApp</td>
+<td>2.55 亿美元</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Home Depot</td>
+<td>约 2 亿美元</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Capital One</td>
+<td>1.9 亿美元</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Uber</td>
+<td>1.48 亿美元</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Morgan Stanley</td>
+<td>1.2 亿美元（总计）</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Google Ireland</td>
+<td>1.02 亿美元</td>
+</tr>
+</tbody></table>
+<h2 id="0x03-风险管理系统"><a href="#0x03-风险管理系统" class="headerlink" title="0x03 风险管理系统"></a>0x03 风险管理系统</h2><p>也正因为风险之间存在着较大的差异，所以不同的威胁的相对重要程度会有所不同，进而导致缓解措施也不同。<strong>为了提供一个系统的思考风险的过程，风险管理框架（risk management framework，RMF）应运而生</strong>，它能列举出各种威胁、确定风险的重要性并定义缓解措施。</p>
+<h2 id="0x04-威胁模型"><a href="#0x04-威胁模型" class="headerlink" title="0x04 威胁模型"></a>0x04 威胁模型</h2><p>由于威胁是风险发生的途径，如何识别并列举出系统潜在的威胁至关重要。<strong>威胁模型（Threat modeling）可以系统地查看系统组件和可能的攻击模式，以帮助您确定系统最容易受到攻击的位置。</strong></p>
+<p>需要注意的是，没有单一的综合的威胁模型，因为威胁模型还取决于风险、特定环境、组织和正在运行的应用程序等种种因素。虽然容器的威胁模型不能列出全部的威胁，但它可以列出大多数容器部署环境所存在的一些共同的潜在威胁。</p>
+<h2 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h2><p>本文，我们通过情景再现，解释了风险、威胁和缓解措施的概念，并且浏览了全球 Top 15 因数据泄露或不遵守安全和隐私法而处以的最高罚款和罚金的事件。</p>
+<p>为了提供一个系统的思考风险和识别威胁的过程，我们简单介绍了风险管理框架和威胁模型的定义。</p>
+<p>需要注意的是，虽然没有一个综合的威胁模型，但为了识别出容器部署环境所存在的威胁，对容器进行威胁建模仍然是一个有效的方式。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AE%B9%E5%99%A8%E5%AE%89%E5%85%A8/" class="print-no-link">#容器安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>1.1 风险、威胁和缓解措施</div>
+      <div>http://example.com/2024/06/11/1-1-风险、威胁和缓解措施/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年6月11日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/06/12/1-2-%E5%AE%B9%E5%99%A8%E5%A8%81%E8%83%81%E6%A8%A1%E5%9E%8B/" title="1.2 容器威胁模型">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">1.2 容器威胁模型</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/07/%E7%AC%AC-1-%E8%AF%BE-%E5%AE%B9%E5%99%A8%E5%AE%89%E5%85%A8%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/" title="第 1 课 容器安全威胁建模">
+                        <span class="hidden-mobile">第 1 课 容器安全威胁建模</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

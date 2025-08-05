@@ -1,0 +1,874 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这是你作为红队成员的第一天，你的任务是检查一个在被钓鱼员工的书签中发现的网站。去看看它会引导你到哪里！范围包括该公司的基础设施，包括云服务。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS S3 Enumeration Basics：AWS S3 枚举基础知识">
+<meta property="og:url" content="http://example.com/2025/05/20/%E3%80%90Pwned-Labs%E3%80%91AWS-S3-Enumeration-Basics%EF%BC%9AAWS-S3-%E6%9E%9A%E4%B8%BE%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="这是你作为红队成员的第一天，你的任务是检查一个在被钓鱼员工的书签中发现的网站。去看看它会引导你到哪里！范围包括该公司的基础设施，包括云服务。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/Xnip2025-08-05_13-31-17.jpg">
+<meta property="article:published_time" content="2025-05-20T06:31:19.000Z">
+<meta property="article:modified_time" content="2025-08-05T06:17:13.968Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="AWS 安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/Xnip2025-08-05_13-31-17.jpg">
+  
+  
+  
+  <title>AWS S3 Enumeration Basics：AWS S3 枚举基础知识 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/Xnip2025-08-05_13-31-17.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="AWS S3 Enumeration Basics：AWS S3 枚举基础知识"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-20 14:31" pubdate>
+          2025年5月20日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">AWS S3 Enumeration Basics：AWS S3 枚举基础知识</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-场景介绍"><a href="#0x00-场景介绍" class="headerlink" title="0x00 场景介绍"></a>0x00 场景介绍</h2><p>这是你作为红队成员的第一天，你的任务是检查一个在被钓鱼员工的书签中发现的网站。</p>
+<p>去看看它会引导你到哪里！范围包括该公司的基础设施，包括云服务。</p>
+<blockquote>
+<p><strong>🎯 点击【阅读原文】，立即进入靶场环境！</strong></p>
+</blockquote>
+<h2 id="0x01-前置知识"><a href="#0x01-前置知识" class="headerlink" title="0x01 前置知识"></a>0x01 前置知识</h2><ul>
+<li>基本的 Linux 命令行知识</li>
+</ul>
+<h2 id="0x02-学习目标"><a href="#0x02-学习目标" class="headerlink" title="0x02 学习目标"></a>0x02 学习目标</h2><ul>
+<li>熟悉 AWS CLI（命令行界面）</li>
+<li>基础的 S3 枚举和凭证窃取</li>
+<li>了解如何防范此类场景</li>
+</ul>
+<h2 id="0x03-难度等级"><a href="#0x03-难度等级" class="headerlink" title="0x03 难度等级"></a>0x03 难度等级</h2><ul>
+<li>初级（Beginner）</li>
+</ul>
+<h2 id="0x04-关注重点"><a href="#0x04-关注重点" class="headerlink" title="0x04 关注重点"></a>0x04 关注重点</h2><ul>
+<li>红队（Red）</li>
+</ul>
+<h2 id="0x05-真实背景"><a href="#0x05-真实背景" class="headerlink" title="0x05 真实背景"></a>0x05 真实背景</h2><p>Amazon S3（简单存储服务）是一个非常流行的 AWS 服务（也是第二古老的服务），用于存储文件和备份，甚至可以用来托管网站。</p>
+<p>这种多功能性让一些人认为，如果将其分为公有网站托管和私有文件存储两个独立服务，可能会更安全。</p>
+<p>近年来，AWS 在用户设置存储桶为“全网可读”时，引入了更多的可视化警告，但只要这个选项还在，就总有人会使用它！多年来，S3 的配置错误和权限过宽已经导致了许多数据泄露事件。</p>
+<h2 id="0x06-解题思路"><a href="#0x06-解题思路" class="headerlink" title="0x06 解题思路"></a>0x06 解题思路</h2><h3 id="6-1-初步分析"><a href="#6-1-初步分析" class="headerlink" title="6.1 初步分析"></a>6.1 初步分析</h3><p>打开题目所提供的网站进行检查，从安全的角度来说，并未发现什么特别的地方。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs http">http://dev.huge-logistics.com<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_I23P_msSDm.png" srcset="/img/loading.gif" lazyload></p>
+<p>检查一下网站的源码。这时，我们发现网站的图片、CSS 和 Java Script 等静态文件都被存储在一个名为<code>dev.huge-logistics.com</code> 的 S3 存储桶中。</p>
+<p><img src="/image/image_hmGWMUYG7h.png" srcset="/img/loading.gif" lazyload></p>
+<p>S3 存储桶是亚马逊简单存储服务（Amazon’s <strong>S</strong>imple <strong>S</strong>torage <strong>S</strong>ervice）上的存储容器，我们可以将文件和图片等数据存储于其中。我们可以将其理解为计算机上的文件夹，不同的是它可以在线进行访问，并且可以存储大量的数据。</p>
+<h3 id="6-2-S3-存储桶权限分析"><a href="#6-2-S3-存储桶权限分析" class="headerlink" title="6.2 S3 存储桶权限分析"></a>6.2 S3 存储桶权限分析</h3><p>我们尝试在浏览器中导航到其中一个文件，然后进行目录遍历，看看是否可以列出存储桶中的其它资源。</p>
+<p>当我们访问以下链接时，它会下载一个大小为 0 的文件：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs http">https://s3.amazonaws.com/dev.huge-logistics.com/static/<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_w5ksXUX4-Z.png" srcset="/img/loading.gif" lazyload></p>
+<p>访问以下链接时，访问被拒绝：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs http">https://s3.amazonaws.com/dev.huge-logistics.com/<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_gEE7SJxGS8.png" srcset="/img/loading.gif" lazyload></p>
+<p>默认情况下，AWS CLI 在请求中包含<code>prefix=</code>（空前缀）和<code>delimiter=/</code>，而我们刚刚通过浏览器发送 GET 请求不包含这些参数。所以，若要在浏览器中列出 S3 存储桶的根目录，我们可以在 URL 中添加这些参数，如下所示：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs http">https://dev.huge-logistics.com.s3.amazonaws.com/?prefix=&amp;delimiter=/<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_U03HwkAK2I.png" srcset="/img/loading.gif" lazyload></p>
+<p>拓展一下，前面两个请求都访问失败，这是因为存储桶设置了以下策略，该策略允许所有人（包括匿名用户）对 S3 桶<code>dev.huge-logistics.com</code>执行<code>ListBucket</code>操作，但仅限列出：</p>
+<ul>
+<li>根目录（<code>&quot;&quot;</code>）</li>
+<li><code>shared/</code>目录</li>
+<li><code>static/</code>目录</li>
+</ul>
+<p>并且只显示“目录级别”内容，不会列出深层文件结构。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>            <span class="hljs-attr">&quot;Sid&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ListBucketRootAndShared&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Effect&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Allow&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Principal&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;*&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Action&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;s3:ListBucket&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Resource&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;arn:aws:s3:::dev.huge-logistics.com&quot;</span><span class="hljs-punctuation">,</span><br>            <span class="hljs-attr">&quot;Condition&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>                <span class="hljs-attr">&quot;StringEquals&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>                    <span class="hljs-attr">&quot;s3:prefix&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>                        <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>                        <span class="hljs-string">&quot;shared/&quot;</span><span class="hljs-punctuation">,</span><br>                        <span class="hljs-string">&quot;static/&quot;</span><br>                    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>                    <span class="hljs-attr">&quot;s3:delimiter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/&quot;</span><br>                <span class="hljs-punctuation">&#125;</span><br>            <span class="hljs-punctuation">&#125;</span><br>        <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>示例值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>`Sid`</td>
+<td>语句 ID</td>
+<td>`ListBucketRootAndShared`</td>
+<td>标识该语句，可选字段，主要用于识别策略语句。</td>
+</tr>
+<tr>
+<td>`Effect`</td>
+<td>执行效果</td>
+<td>`Allow`</td>
+<td>表示允许该操作（也可能为`Deny`）。</td>
+</tr>
+<tr>
+<td>`Principal`</td>
+<td>操作的主体</td>
+<td><code>*</code></td>
+<td>表示<strong>所有用户</strong>都可以执行该操作（包含匿名用户）。</td>
+</tr>
+<tr>
+<td>`Action`</td>
+<td>允许的操作</td>
+<td>`s3:ListBucket`</td>
+<td>允许执行列出桶内对象键（文件名）的操作。</td>
+</tr>
+<tr>
+<td>`Resource`</td>
+<td>作用对象</td>
+<td>`arn:aws:s3:::dev.huge-logistics.com`</td>
+<td>指定策略作用的 S3 存储桶（注意：这是桶，不是文件）。</td>
+</tr>
+<tr>
+<td>`Condition`</td>
+<td>条件限制</td>
+<td>如下所示</td>
+<td>只有满足以下子条件时，才能执行操作。</td>
+</tr>
+<tr>
+<td>└─`s3:prefix`</td>
+<td>被列出的前缀路径</td>
+<td>`[“”, “shared&#x2F;“, “static&#x2F;“]`</td>
+<td>只允许列出根目录、`shared&#x2F;`和`static&#x2F;`目录中的对象。</td>
+</tr>
+<tr>
+<td>└─`s3:delimiter`</td>
+<td>分隔符</td>
+<td>`“&#x2F;“`</td>
+<td>将对象按“文件夹”层次结构划分（常用于目录浏览效果）。</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>很多浏览器默认以纯文本的方式展示 XML 文件，我们可以查看网页源码，获得 XML 的完整结构，这里已经通过 <a target="_blank" rel="noopener" href="https://sourceforge.net/projects/xml-viewer-plus/" title="XML Viewer Plus">XML Viewer Plus</a> 插件进行了格式化</p>
+</blockquote>
+<h3 id="6-3-利用-AWS-CLI-获取更多信息"><a href="#6-3-利用-AWS-CLI-获取更多信息" class="headerlink" title="6.3 利用 AWS CLI 获取更多信息"></a>6.3 利用 AWS CLI 获取更多信息</h3><blockquote>
+<p>在基于 Debian 的 Linux 发行版（例如 Ubuntu）上，我们可以通过命令 <code>apt install awscli</code>安装 AWS CLI。对于其他发行版和操作系统，请参阅 AWS<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html" title="文档">文档</a>。</p>
+</blockquote>
+<p>现在，我们可以使用 AWS CLI 来检查存储桶了。尝试使用以下命令列出其内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com --no-sign-request<br></code></pre></td></tr></table></figure>
+
+<p>由于我们安装的 AWS CLI 是 v2 版本，该版本默认情况下会对请求进行签名。所以，我们需要通过<code>--no-sign-request</code> 来发送未签名的请求来测试存储桶的公共访问。如果不指定该标志，那么 AWS CLI 将使用本地配置的 AWS 凭证。</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>aws</td>
+<td>工具的名称</td>
+</tr>
+<tr>
+<td>s3</td>
+<td>与之交互的服务名称，在本例中是 Amazon S3</td>
+</tr>
+<tr>
+<td>ls</td>
+<td>执行的操作，在本例中是列出内容</td>
+</tr>
+<tr>
+<td>URL</td>
+<td>`s3:&#x2F;&#x2F;dev.huge-logistics.com`指的是 S3 存储桶的名称。</td>
+</tr>
+<tr>
+<td>s3:&#x2F;&#x2F;</td>
+<td>列出存储桶时不必指定前缀，但其他操作（如复制文件`cp`）需要此前缀。</td>
+</tr>
+<tr>
+<td>--no-sign-request</td>
+<td>禁止对请求进行签名</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>AWS CLI v1 默认情况下是不会对请求进行签名的，若之前有通过 aws configure 进行了配置，我们还可以通过 <code>rm -rf ~/.aws</code> 进行删除。</p>
+</blockquote>
+<p>命令已成功执行了，这表明 S3 bucket 已开放，可供整个互联网访问。这在用于存储公网内容的情况下是合理的，但它似乎还包含其他目录……</p>
+<p><img src="/image/image_6yUovGoDsQ.png" srcset="/img/loading.gif" lazyload></p>
+<p>接下来，我们尝试通过<code>--recursive</code>列出所有的目录，但由于访问被拒绝而失败，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com --no-sign-request --recursive<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_hOSpgRLrUA.png" srcset="/img/loading.gif" lazyload></p>
+<p>那么我们就一一列出这些目录吧。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/admin/ --no-sign-request<br>aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/migration-files/ --no-sign-request<br>aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/shared/ --no-sign-request<br>aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/static/ --no-sign-request<br><br></code></pre></td></tr></table></figure>
+
+<p>总结一下，<code>admin</code> 目录和 <code>migration</code> 目录不允许访问，<code>static</code> 目录下似乎没有什么有用的信息，可能就只有<code>migration-files</code> 目录有点戏了。</p>
+<p><img src="/image/image_Agsg6Xph6j.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="6-4-下载并分析压缩包"><a href="#6-4-下载并分析压缩包" class="headerlink" title="6.4 下载并分析压缩包"></a>6.4 下载并分析压缩包</h3><p>我们先下载下来进行分析。将压缩包进行解压过后，我们发现了一个 PowerShell 脚本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/shared/hl_migration_project.zip . --no-sign-request<br>unzip hl_migration_project.zip -d hl_migration_project<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_WFbY6aybec.png" srcset="/img/loading.gif" lazyload></p>
+<p>该脚本包含了硬编码的 AWS 密钥，脚本的目的似乎是获取存储在 XML 文件中的 secret，并将其存储在 AWS Secrets Manager 中。Secrets Manager 是一项服务，可帮助安全地存储、管理和检索 API 密钥和数据库凭证等密钥。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-comment"># AWS Configuration</span><br><span class="hljs-comment"># AWS 配置</span><br><span class="hljs-variable">$accessKey</span> = <span class="hljs-string">&quot;AKIA3SFMDAPOWOWKXEHU&quot;</span><br><span class="hljs-variable">$secretKey</span> = <span class="hljs-string">&quot;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&quot;</span><br><span class="hljs-variable">$region</span> = <span class="hljs-string">&quot;us-east-1&quot;</span><br><br><span class="hljs-comment"># Set up AWS hardcoded credentials</span><br><span class="hljs-comment"># 设置 AWS 硬编码凭证</span><br><span class="hljs-built_in">Set-AWSCredentials</span> <span class="hljs-literal">-AccessKey</span> <span class="hljs-variable">$accessKey</span> <span class="hljs-literal">-SecretKey</span> <span class="hljs-variable">$secretKey</span><br><br><span class="hljs-comment"># Set the AWS region</span><br><span class="hljs-comment"># 设置 AWS 区域</span><br><span class="hljs-built_in">Set-DefaultAWSRegion</span> <span class="hljs-literal">-Region</span> <span class="hljs-variable">$region</span><br><br><span class="hljs-comment"># Read the secrets from export.xml</span><br><span class="hljs-comment"># 从 export.xml 中读取 secret</span><br>[<span class="hljs-built_in">xml</span>]<span class="hljs-variable">$xmlContent</span> = <span class="hljs-built_in">Get-Content</span> <span class="hljs-literal">-Path</span> <span class="hljs-string">&quot;export.xml&quot;</span><br><br><span class="hljs-comment"># Output log file</span><br><span class="hljs-comment"># 输出日志文件</span><br><span class="hljs-variable">$logFile</span> = <span class="hljs-string">&quot;upload_log.txt&quot;</span><br><br><span class="hljs-comment"># Error handling with retry logic</span><br><span class="hljs-comment"># 使用重试逻辑进行错误处理</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TryUploadSecret</span><span class="hljs-params">(<span class="hljs-variable">$secretName</span>, <span class="hljs-variable">$secretValue</span>)</span></span> &#123;<br>    <span class="hljs-variable">$retries</span> = <span class="hljs-number">3</span><br>    <span class="hljs-keyword">while</span> (<span class="hljs-variable">$retries</span> <span class="hljs-operator">-gt</span> <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-variable">$result</span> = <span class="hljs-built_in">New-SECSecret</span> <span class="hljs-literal">-Name</span> <span class="hljs-variable">$secretName</span> <span class="hljs-literal">-SecretString</span> <span class="hljs-variable">$secretValue</span><br>            <span class="hljs-variable">$logEntry</span> = <span class="hljs-string">&quot;Successfully uploaded secret: <span class="hljs-variable">$secretName</span> with ARN: <span class="hljs-variable">$</span>(<span class="hljs-variable">$result</span>.ARN)&quot;</span><br>            <span class="hljs-built_in">Write-Output</span> <span class="hljs-variable">$logEntry</span><br>            <span class="hljs-built_in">Add-Content</span> <span class="hljs-literal">-Path</span> <span class="hljs-variable">$logFile</span> <span class="hljs-literal">-Value</span> <span class="hljs-variable">$logEntry</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-variable">$true</span><br>        &#125; <span class="hljs-keyword">catch</span> &#123;<br>            <span class="hljs-variable">$retries</span><span class="hljs-literal">--</span><br>            <span class="hljs-built_in">Write-Error</span> <span class="hljs-string">&quot;Failed attempt to upload secret: <span class="hljs-variable">$secretName</span>. Retries left: <span class="hljs-variable">$retries</span>. Error: <span class="hljs-variable">$_</span>&quot;</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable">$false</span><br>&#125;<br><br><span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$secretNode</span> <span class="hljs-keyword">in</span> <span class="hljs-variable">$xmlContent</span>.Secrets.Secret) &#123;<br>    <span class="hljs-comment"># Implementing concurrency using jobs</span><br>    <span class="hljs-comment"># 使用作业实现并发</span><br>    <span class="hljs-built_in">Start-Job</span> <span class="hljs-literal">-ScriptBlock</span> &#123;<br>        <span class="hljs-keyword">param</span>(<span class="hljs-variable">$secretName</span>, <span class="hljs-variable">$secretValue</span>)<br>        TryUploadSecret <span class="hljs-literal">-secretName</span> <span class="hljs-variable">$secretName</span> <span class="hljs-literal">-secretValue</span> <span class="hljs-variable">$secretValue</span><br>    &#125; <span class="hljs-literal">-ArgumentList</span> <span class="hljs-variable">$secretNode</span>.Name, <span class="hljs-variable">$secretNode</span>.Value<br>&#125;<br><br><span class="hljs-comment"># Wait for all jobs to finish</span><br><span class="hljs-comment"># 等待所有作业完成</span><br><span class="hljs-variable">$jobs</span> = <span class="hljs-built_in">Get-Job</span><br><span class="hljs-variable">$jobs</span> | <span class="hljs-built_in">Wait-Job</span><br><br><span class="hljs-comment"># Retrieve and display job results</span><br><span class="hljs-comment"># 获取并显示作业结果</span><br><span class="hljs-variable">$jobs</span> | <span class="hljs-built_in">ForEach-Object</span> &#123;<br>    <span class="hljs-variable">$result</span> = <span class="hljs-built_in">Receive-Job</span> <span class="hljs-literal">-Job</span> <span class="hljs-variable">$_</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-operator">-not</span> <span class="hljs-variable">$result</span>) &#123;<br>        <span class="hljs-built_in">Write-Error</span> <span class="hljs-string">&quot;Failed to upload secret: <span class="hljs-variable">$</span>(<span class="hljs-variable">$_</span>.Name) after multiple retries.&quot;</span><br>    &#125;<br>    <span class="hljs-comment"># Clean up the job</span><br>    <span class="hljs-comment"># 清理作业</span><br>    <span class="hljs-built_in">Remove-Job</span> <span class="hljs-literal">-Job</span> <span class="hljs-variable">$_</span><br>&#125;<br><br><span class="hljs-built_in">Write-Output</span> <span class="hljs-string">&quot;Batch upload complete!&quot;</span><br><br><br><span class="hljs-comment"># Install-Module -Name AWSPowerShell -Scope CurrentUser -Force</span><br><span class="hljs-comment"># 安装模块 -Name AWSPowerShell -Scope CurrentUser -Force</span><br><span class="hljs-comment"># .\migrate_secrets.ps1%                                                                                                                            </span><br></code></pre></td></tr></table></figure>
+
+<p>除了 access key 和 secret key 之外，我们还可以从脚本中看到 region 为<code>us-east-1</code>。对于攻击者而言，在设置密钥时，了解使用的是哪个区域是非常有用的。当然，我们仍然可以通过以下命令，从 S3 存储桶中获取更多的线索。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -I https://s3.amazonaws.com/dev.huge-logistics.com/<br></code></pre></td></tr></table></figure>
+
+<p>该命令仅返回请求头，这进一步表明存储桶是在<code>us-east-1</code>区域中创建的。</p>
+<p><img src="/image/image_kln-iPRzUN.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="6-5-利用泄露的-AWS-密钥提升权限"><a href="#6-5-利用泄露的-AWS-密钥提升权限" class="headerlink" title="6.5 利用泄露的 AWS 密钥提升权限"></a>6.5 利用泄露的 AWS 密钥提升权限</h3><p>接下来，我们就可以通过下面的命令设置 AWS CLI 的密钥了，其中 access key 相当于用户名，secret key 相当于密码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws configure<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_P-PBlPXpIB.png" srcset="/img/loading.gif" lazyload></p>
+<p>我们不需要像在 Linux 和 Windows 上那样运行<code>whoami</code>，而是通过以下命令，再次验证我们的身份。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws sts get-caller-identity<br></code></pre></td></tr></table></figure>
+
+<p>命令显示我们的用户名<code>pam-test</code>，再根据脚本的性质，我们可以假设 pam 代表特权访问管理 (Privilege Access Management)。</p>
+<p><img src="/image/image_LEqyQ34_va.png" srcset="/img/loading.gif" lazyload></p>
+<p>因此，我们再尝试列出刚刚无法访问的目录。这里，需要注意的是，我们现在已经拥有有效的 AWS 凭证了，可以删除<code>--no-sign-request</code> 标志，使用我们刚刚设置的密钥对请求进行签名了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/admin/<br>aws s3 <span class="hljs-built_in">ls</span> s3://dev.huge-logistics.com/migration-files/<br><br></code></pre></td></tr></table></figure>
+
+<p>除了一些常规的资料文件之外，我们看到了 flag 文件、power shell 文件以及 xml 文件。</p>
+<p><img src="/image/image_5s4pvDgS7j.png" srcset="/img/loading.gif" lazyload></p>
+<p>我们先将它们下载到本地，再进行分析。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/admin/flag.txt .<br>aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/migration-files/migrate_secrets.ps1 .<br>aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/migration-files/test-export.xml .<br><br></code></pre></td></tr></table></figure>
+
+<p>但当前的 AWS 凭证无法下载 flag 文件。我们只能从其它的两个文件中找到线索了。</p>
+<p><img src="/image/image_MrxTMO2kWK.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="6-6-利用泄露的-AWS-密钥再次提权"><a href="#6-6-利用泄露的-AWS-密钥再次提权" class="headerlink" title="6.6 利用泄露的 AWS 密钥再次提权"></a>6.6 利用泄露的 AWS 密钥再次提权</h3><p>查看<code>test-export.xml</code> 文件，我们发现了新的 AWS 凭证。</p>
+<p><img src="/image/image_RDEz00s8CY.png" srcset="/img/loading.gif" lazyload></p>
+<p>我们使用新的凭证配置 AWS CLI，现在我们是 <code>it-admin</code> 用户了。</p>
+<p><img src="/image/image_u5Ukgxr7W8.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="6-7-成功获取-Flag-和敏感信息"><a href="#6-7-成功获取-Flag-和敏感信息" class="headerlink" title="6.7 成功获取 Flag 和敏感信息"></a>6.7 成功获取 Flag 和敏感信息</h3><p>我们需要做的第一件事情便是下载 <code>flag.txt</code> 文件，获取 flag。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/admin/flag.txt .<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_oJymloxgwo.png" srcset="/img/loading.gif" lazyload></p>
+<p>此外，管理员账户<code>it-admin</code>还能访问管理员文件夹，里面竟然有用户信用卡号和其他 PII（个人身份信息）的明文信息！于是该网站被攻陷了！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">aws s3 <span class="hljs-built_in">cp</span> s3://dev.huge-logistics.com/admin/website_transactions_export.csv .<br></code></pre></td></tr></table></figure>
+
+<p><img src="/image/image_GGGxLwDzGG.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="0x07-总结"><a href="#0x07-总结" class="headerlink" title="0x07 总结"></a>0x07 总结</h2><p>该数据泄露的根本原因是存储桶的错误配置和存储敏感文件的管理失误。为了避免类似情况发生，应加强存储桶的权限管理、避免硬编码凭证、提高敏感数据的保护级别，采用更安全的文件共享和加密方法。</p>
+<ol>
+<li>S3 存储桶使用不当<ul>
+<li>问题：S3 存储桶被用于托管静态网站文件和存储敏感文件。</li>
+<li>建议：存储桶应分开使用。托管静态网站文件的存储桶不应存储敏感文件，应为敏感文件使用独立存储桶。</li>
+</ul>
+</li>
+<li><code>shared</code>目录的权限设置问题<ul>
+<li>问题：<code>shared</code>目录设置为全网可读，可能是为了与外部承包商或顾问共享迁移脚本。</li>
+<li>风险：即使是短时间内共享敏感文件，也可能带来巨大风险，因为脚本和机器人能够自动检测变化并下载文件。</li>
+<li>建议：通过更安全的方式共享文件，并用强随机密码加密压缩文件，确保文件的安全。</li>
+</ul>
+</li>
+<li>AWS 凭证硬编码问题<ul>
+<li>问题：AWS 凭证被硬编码到 PowerShell 脚本中。</li>
+<li>风险：任何人都可以访问这些凭证，从而进入云环境，导致账户被恶意使用。</li>
+<li>建议：避免在代码中硬编码凭证，改用更安全的凭证管理方式，例如 IAM 角色或环境变量。</li>
+</ul>
+</li>
+<li>PAM 系统导出文件暴露问题<ul>
+<li>问题：一个从安全 PAM 系统导出的 XML 文件被存储在 S3 存储桶中，并且可以被第一个被攻击的 IAM 账户访问。</li>
+<li>风险：该文件包含高权限凭证，泄露了 Huge Logistics 本地和云基础设施的敏感信息。</li>
+<li>进一步风险：该文件还包含第二个被攻击账户的凭证，该账户具有比第一个账户更多的权限，允许访问未加密的客户数据，暴露了客户机密信息。</li>
+<li>后果：可能导致财务损失、身份盗窃和公司声誉受损。</li>
+</ul>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AWS-%E5%AE%89%E5%85%A8/" class="print-no-link">#AWS 安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>AWS S3 Enumeration Basics：AWS S3 枚举基础知识</div>
+      <div>http://example.com/2025/05/20/【Pwned-Labs】AWS-S3-Enumeration-Basics：AWS-S3-枚举基础知识/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/20/%E3%80%90Pwned-Labs%E3%80%91Uncover-Secrets-in-CodeCommit-and-Docker%EF%BC%9A%E6%8F%AD%E5%BC%80-CodeCommit-%E5%92%8C-Docker-%E7%9A%84%E7%A7%98%E5%AF%86/" title="Uncover Secrets in CodeCommit and Docker：揭开 CodeCommit 和 Docker 的秘密">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Uncover Secrets in CodeCommit and Docker：揭开 CodeCommit 和 Docker 的秘密</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/20/%E3%80%90Pwned-Labs%E3%80%91Breach-in-the-Cloud%EF%BC%9A%E4%BA%91%E7%AB%AF%E6%95%B0%E6%8D%AE%E6%B3%84%E9%9C%B2/" title="Breach in the Cloud：云端数据泄露">
+                        <span class="hidden-mobile">Breach in the Cloud：云端数据泄露</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

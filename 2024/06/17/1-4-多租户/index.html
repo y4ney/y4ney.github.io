@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="我们在《1.3 安全边界》中简单说明了安全边界的概念和重要性。众所周知，“多租户”是云计算的一大特点，而云原生是“云计算 2.0”。所以，接下来让我们来看看多租户环境下，其安全边界将面临哪些威胁。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.4 多租户">
+<meta property="og:url" content="http://example.com/2024/06/17/1-4-%E5%A4%9A%E7%A7%9F%E6%88%B7/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="我们在《1.3 安全边界》中简单说明了安全边界的概念和重要性。众所周知，“多租户”是云计算的一大特点，而云原生是“云计算 2.0”。所以，接下来让我们来看看多租户环境下，其安全边界将面临哪些威胁。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/8131713496802_.pic_hd.png">
+<meta property="article:published_time" content="2024-06-17T04:00:30.000Z">
+<meta property="article:modified_time" content="2025-08-05T05:22:13.297Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="容器安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/8131713496802_.pic_hd.png">
+  
+  
+  
+  <title>1.4 多租户 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/8131713496802_.pic_hd.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="1.4 多租户"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-17 12:00" pubdate>
+          2024年6月17日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">1.4 多租户</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>我们在<a href="../../../../2024/06/13/1-3-%E5%AE%89%E5%85%A8%E8%BE%B9%E7%95%8C/">《1.3 安全边界》</a>中简单说明了安全边界的概念和重要性。众所周知，“多租户”是云计算的一大特点，而云原生是“云计算 2.0”。所以，接下来让我们来看看多租户环境下，其安全边界将面临哪些威胁。</p>
+<h2 id="0x01-多租户的概念"><a href="#0x01-多租户的概念" class="headerlink" title="0x01 多租户的概念"></a>0x01 多租户的概念</h2><p>在 20 世纪 60 年代的大型机时代，多租户的概念就存在了，当时的用户可以租用共享机器上的 CPU 时间、内存和存储空间等资源。</p>
+<p><img src="/image/image_33fjLHAnZH.png" srcset="/img/loading.gif" lazyload alt="图 1:20 世纪 60 年代的大型机" title="图1：20世纪60年代的大型机"></p>
+<p>这和如今的公有云并没有太大的区别。因为，现在的用户也可以在亚马逊 的 AWS、微软的 Azure 或谷歌的云平台等公有云平台上租用 CPU 时间、内存和存储空间等资源，此外，用户还可以租用公有云的其他功能和托管服务。</p>
+<p><img src="/image/image_bui3nXuWHY.png" srcset="/img/loading.gif" lazyload alt="图 2：单租户 VS 多租户" title="图2：单租户 VS 多租户"></p>
+<p>2006 年 8 月 24 日，亚马逊的 AWS 推出了 EC2，此后我们便可以租用运行在世界各地数据中心机架上的虚拟机实例了。虽然很多虚拟机都运行在物理机上，但你无法知道是谁操作你邻近的虚拟机。</p>
+<p><img src="/image/image_o2YkdvUsJC.png" srcset="/img/loading.gif" lazyload alt="图 3：亚马逊的 AWS 推出了 EC2" title="图3：亚马逊的AWS推出了EC2"></p>
+<h2 id="0x02-共享机器"><a href="#0x02-共享机器" class="headerlink" title="0x02 共享机器"></a>0x02 共享机器</h2><p>一台 Linux 主机（或虚拟机）可能会被多个用户共享。这样的多租户的例子在大学中非常常见。</p>
+<p>在这种情况下，不仅用户之间彼此不信任，连系统管理员也不信任用户。因此，<strong>管理员需要利用 Linux 的访问控制来严格限制用户的访问权限</strong>，让每个用户都拥有一个登录 ID。这时，用户只能查看并修改自己目录中的文件，不能访问并修改他人目录中的文件。</p>
+<p><img src="/image/image_49HsuwdA6d.png" srcset="/img/loading.gif" lazyload alt="图 4：Linux 的访问控制" title="图4：Linux 的访问控制"></p>
+<p>但正如我们在 <strong>《第 4 课：容器之间的隔离》</strong> 中所说到的那样：<strong>所有运行在同一宿主机上的容器都共享一个内核。</strong> 因此，若这台机器正在运行 Docker 守护进程，那么任何能执行 Docker 命令的用户都拥有 root 访问权限。</p>
+<p><img src="/image/image_P3IgVRrDTC.png" srcset="/img/loading.gif" lazyload alt="图 5：Docker 容器 VS 虚拟机" title="图5：Docker 容器 VS 虚拟机"></p>
+<p>很明显，系统管理员不愿意将这种权限授予不受信任的用户。因此，在企业环境中，甚至在云原生环境中，你不太可能会看到这种共享机器的方式。事实上，哪怕彼此信任的用户或用户团队通常都会以虚拟机的形式进行资源分配的。</p>
+<h2 id="0x03-虚拟化"><a href="#0x03-虚拟化" class="headerlink" title="0x03 虚拟化"></a>0x03 虚拟化</h2><p>但请注意的是，<strong>虚拟化并不算是多租户</strong>：从<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Multitenancy" title="定义">定义</a>上来说，多租户指的是不同的用户群体共享一个软件实例。而在虚拟化的环境中，用户通过无法访问 hypervisor（虚拟机管理程序）来管理虚拟机，即用户不共享任何软件。</p>
+<p>一般来说，虚拟机之间的隔离是非常强的，你的“邻居”不太可能观察或干涉到你在虚拟机中的行为。关于如何实现这种隔离，我们将在 <strong>《第 5 课：虚拟机》</strong> 中进行讲解。</p>
+<p>但也并不是说虚拟机之间的隔离就是非常完美的，曾有用户抱怨过“嘈杂邻居”的问题，即由于您与其他用户共享一台物理机，所以可能会导致性能出现意外的波动。</p>
+<p><img src="/image/image_T5C36QnFhx.png" srcset="/img/loading.gif" lazyload alt="图 6：嘈杂邻居的问题" title="图6：嘈杂邻居的问题"></p>
+<p>作为最早一批使用公有云的厂商，Netflix 在 2010 年 12 月 16 日发表了一篇名为<a target="_blank" rel="noopener" href="https://netflixtechblog.com/5-lessons-weve-learned-using-aws-1f2a28588e4c" title="《5 Lessons We’ve Learned Using AWS》">《5 Lessons We’ve Learned Using AWS》</a>的博客。在这篇博客中，Netflix 表示“合租模式可能在堆栈的任何层次引入吞吐量的变动。为了保证系统的可靠性和高效性，您要么在必要时放弃所运行的子任务，要么在 AWS 内管理您的资源以避免合租。”</p>
+<p>2016 年 5 月 24 日，David Linthicum 发表了一篇名为<a target="_blank" rel="noopener" href="https://www.infoworld.com/article/3073503/debunking-the-clouds-noisy-neighbor-myth.html" title="《Debunking the cloud&#39;s &#39;noisy neighbor&#39; myth》">《Debunking the cloud’s ‘noisy neighbor’ myth》</a>的博客，在这篇博客中，他认为“嘈杂邻居”已经不再是一个真正的问题了。</p>
+<p>不仅如此，也有一些<strong>已知的软件漏洞会破坏虚拟机之间的安全边界</strong>。对于政府、金融或医疗部门等机构而言，这些漏洞所造成的后果会十分严重，因此完全的物理隔离是十分有必要的。</p>
+<p><img src="/image/image_aQcE7cQrmW.png" srcset="/img/loading.gif" lazyload alt="图 7：虚拟机逃逸漏洞" title="图7：虚拟机逃逸漏洞"></p>
+<p>我们建议您<strong>搭建一个私有云来确保工作负载可以被完全地隔离起来</strong>。这个私有云可以运行在您的数据中心中，也可以让服务提供商代为管理。不仅如此，私有云有时还会附带额外的安全功能，例如，对有权访问数据中心的人员进行额外的背景调查。</p>
+<p>许多云提供商会提供物理机或虚拟机两种租赁方式。若您租赁的是虚拟机，可以让供应商保证你是物理机上唯一的客户；若您租赁的是物理机，您将得到一个裸金属的机器。这两种方式都可以保证您是物理机上的唯一的客户，所以您将具备物理机之间的更强的隔离性，并将完全避免“嘈杂邻居”的问题。&#x20;</p>
+<p><img src="/image/image_IfcmNVTYGe.png" srcset="/img/loading.gif" lazyload alt="图 8：私有云 VS 公有云" title="图8：私有云 VS 公有云"></p>
+<p>但无论您是在私有云中使用物理机还是虚拟机，还是使用自己的服务器，只有您运行着容器，您都需要考虑容器之间多租户的安全边界问题。</p>
+<h2 id="0x04-容器多租户"><a href="#0x04-容器多租户" class="headerlink" title="0x04 容器多租户"></a>0x04 容器多租户</h2><p>正如您在 <strong>《第 4 课：容器之间的隔离》</strong> 中所看到的那样：<strong>容器之间的隔离比不上虚拟机之间的那么强。</strong></p>
+<p>虽然这取决于您的风险状况，但说实话，您可能也不希望和不信任的人在同一台机器上使用容器。退一万步来讲，即使您与完全信任的人在同一台机器上使用容器，但您应该也希望容器之间不受干扰来减轻人为失误所带来的风险。</p>
+<p>在 Kubernetes 中，您可以使用 Namespace（命名空间）来细分集群机器，以供不同的人、团队或应用程序使用。想要做到这一点，只需使用 RBAC（role-based access control，基于角色的访问控制）即可。</p>
+<p><img src="/image/image_hb-c2oYnhf.png" srcset="/img/loading.gif" lazyload alt="图 9：多租户模型的剧群" title="图9：多租户模型的剧群"></p>
+<p>但在这篇文章中，我们不会详细介绍如何通过 RBAC 来进行配置，详情请看 Kubernetes 的<a target="_blank" rel="noopener" href="https://kubernetes.io/zh-cn/docs/concepts/security/multi-tenancy/" title="官方文档">官方文档</a>。需要注意的是，RBAC 仅能控制您可以通过 Kubernetes API 进行的操作。</p>
+<blockquote>
+<p>🚥友情提示，Namespace 是一个多义词：</p>
+<ol>
+<li>在 Linux 中，Namespace 是可以隔离进程可见资源的底层机制；</li>
+<li>在 Kubernetes 中，Namespace 可以对集群资源应用不同的访问控制；</li>
+</ol>
+<p>我们将在 <strong>《第 4 课：容器之间的隔离》</strong> 中进行讲解。</p>
+</blockquote>
+<p>不仅如此，运行在同一宿主机上的同一个 Pod 的容器即使位于不同的 Namespace 中，但其安全边界的保护仍然依赖于容器的隔离机制，所以如果攻击者可以从容器中逃逸到宿主机上，即使容器处于不同的 Namespace 中，它们仍然有可能相互影响或互相干扰。</p>
+<h2 id="0x05-容器实例"><a href="#0x05-容器实例" class="headerlink" title="0x05 容器实例"></a>0x05 容器实例</h2><p>像亚马逊的 AWS、微软的 Azure 和谷歌的云平台这样的公有云提供商都提供了许多托管服务，让用户无需安装或管理即可租用组件、存储及其他组件。</p>
+<p>例如，亚马逊提供关系数据库服务（Relational Database Service，RDS），若您购买了该服务，您只需简单配置一下就可以使用 PostgreSQL 等知名的软件数据库，若您想备份数据只需简单勾选一下即可（当然还需要支付相关费用）。</p>
+<p>如今，托管服务也扩展到了容器的领域。例如 Azure 的<a target="_blank" rel="noopener" href="https://azure.microsoft.com/en-us/products/container-instances" title="Container Instances">Container Instances</a>和 AWS 的<a target="_blank" rel="noopener" href="https://aws.amazon.com/cn/fargate/" title="Fargate">Fargate</a>可以让您无需考虑底层主机（或虚拟机）就可以轻松地运行容器。</p>
+<p><img src="/image/image_mtm8pYblM2.png" srcset="/img/loading.gif" lazyload alt="图 10：AWS 的 Fargate" title="图 10：AWS的Fargate"></p>
+<p>这样就可以大大地减轻管理的负担，并且您可以随意地扩展部署环境。然而，理论上，您的容器实例可能会与其他客户的容器实例运行在同一虚拟机上。如果有疑问，请咨询相应的云服务提供商。</p>
+<h2 id="0x06-总结"><a href="#0x06-总结" class="headerlink" title="0x06 总结"></a>0x06 总结</h2><p>现在，您已经了解了您的部署环境可能面临的诸多潜在威胁，但在探讨其他内容之前，我们还需要学习一些基本的安全原则。</p>
+<p>这些安全原则可以指导您如何在部署环境中引入安全工具与安全流程。</p>
+<p>下期再见～</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AE%B9%E5%99%A8%E5%AE%89%E5%85%A8/" class="print-no-link">#容器安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>1.4 多租户</div>
+      <div>http://example.com/2024/06/17/1-4-多租户/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年6月17日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/06/18/1-5-%E5%AE%89%E5%85%A8%E5%8E%9F%E5%88%99/" title="1.5 安全原则">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">1.5 安全原则</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/13/1-3-%E5%AE%89%E5%85%A8%E8%BE%B9%E7%95%8C/" title="1.3 安全边界">
+                        <span class="hidden-mobile">1.3 安全边界</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

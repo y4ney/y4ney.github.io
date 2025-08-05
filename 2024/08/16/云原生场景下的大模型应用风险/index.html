@@ -1,0 +1,797 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="2022 年底，随着 ChatGPT 进入大众市场，人们对大型语言模型（LLM，Large Language Model）的关注尤为浓厚。渴望利用 LLM 潜力的企业正在迅速将其整合到其运营和面向客户的产品中。然而，LLM 的采用速度已经超过了全面安全协议的建立速度，导致许多应用程序容易受到高风险问题的影响。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="云原生场景下的大模型应用风险">
+<meta property="og:url" content="http://example.com/2024/08/16/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%9C%BA%E6%99%AF%E4%B8%8B%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E9%A3%8E%E9%99%A9/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="2022 年底，随着 ChatGPT 进入大众市场，人们对大型语言模型（LLM，Large Language Model）的关注尤为浓厚。渴望利用 LLM 潜力的企业正在迅速将其整合到其运营和面向客户的产品中。然而，LLM 的采用速度已经超过了全面安全协议的建立速度，导致许多应用程序容易受到高风险问题的影响。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/image_z6qn7bZI8w.png">
+<meta property="article:published_time" content="2024-08-16T04:43:08.000Z">
+<meta property="article:modified_time" content="2025-08-05T05:27:31.176Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="云原生安全">
+<meta property="article:tag" content="LLM 安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/image_z6qn7bZI8w.png">
+  
+  
+  
+  <title>云原生场景下的大模型应用风险 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/image_z6qn7bZI8w.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="云原生场景下的大模型应用风险"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-16 12:43" pubdate>
+          2024年8月16日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">云原生场景下的大模型应用风险</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>2022 年底，随着 ChatGPT 进入大众市场，人们对大型语言模型（LLM，Large Language Model）的关注尤为浓厚。渴望利用 LLM 潜力的企业正在迅速将其整合到其运营和面向客户的产品中。</p>
+<p>然而，LLM 的采用速度已经超过了全面安全协议的建立速度，导致许多应用程序容易受到高风险问题的影响。</p>
+<p><strong>本文，我们将以 OWASP LLM top 10 作为切入点，剖析云原生场景下的 LLM 风险。</strong></p>
+<h2 id="0x01-OWASP-LLM-top10"><a href="#0x01-OWASP-LLM-top10" class="headerlink" title="0x01 OWASP LLM top10"></a>0x01 OWASP LLM top10</h2><p>随着 GPT、Llama 2 和 Gemini 等 LLM 的涌现，LLM 相关的安全风险也受到了大家的关注，例如</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://simonwillison.net/2022/Sep/12/prompt-injection/" title="针对 GPT-3 的即时注入攻击">针对 GPT-3 的即时注入攻击</a></li>
+<li><a target="_blank" rel="noopener" href="https://embracethered.com/blog/posts/2023/chatgpt-plugin-vulns-chat-with-code/" title="可以访问网站并窃取源代码的LLM插件漏洞">可以访问网站并窃取源代码的 LLM 插件漏洞</a></li>
+<li><a target="_blank" rel="noopener" href="https://security.snyk.io/vuln/SNYK-PYTHON-LANGCHAIN-5411357" title="影响langchain的任意代码执行漏洞">影响 langchain 的任意代码执行漏洞</a></li>
+<li>……</li>
+</ul>
+<p>当时，LLM 还没有统一的资源来解决这些安全问题，很多开发者也对 LLM 的相关风险不够了解。为了解决这个问题，2023 年 10 月 16 日，来自不同背景的近 500 名专家和超过 125 名积极贡献者在其专业知识的基础上，进行了一个月的集思广益，提出了 LLM 潜在的 43 个不同风险。经过多轮的讨论和投票，<a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/" title="OWASP">OWASP</a>最终将这些提案细化为十大最关键漏洞的简明列表。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>风险名称</th>
+<th>风险描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLM01</td>
+<td>提示词 (Prompt) 注入 (Injection)</td>
+<td>黑客通过设计过的输入 (提示词) 操纵大型语言模型 (LLM)，从而导致 LLM 执行意外操作。提示词注入会覆盖系统提示词，而间接注入操纵外部数据源进行注入攻击。</td>
+</tr>
+<tr>
+<td>LLM02</td>
+<td>不安全的输出处理</td>
+<td>当 LLM 输出未经审查而被接受时，就会出现此漏洞，从而暴露后端系统。&#xA;滥用可能会导致 XSS、CSRF、SSRF、权限升级或远程代码执行等严重后果。</td>
+</tr>
+<tr>
+<td>LLM03</td>
+<td>训练数据中毒</td>
+<td>当 LLM 培训数据被篡改，引入损害安全性、有效性或道德行为的漏洞或偏见时，就会发生这种情况。来源包括 Common Crawl、WebText、OpenWebText 和书籍。</td>
+</tr>
+<tr>
+<td>LLM04</td>
+<td>拒绝服务模型</td>
+<td>攻击者对大型语言模型进行资源密集型操作，导致服务降级或高成本。由于 LLM 的资源密集型性质和用户输入的不可预测性，该漏洞被放大。</td>
+</tr>
+<tr>
+<td>LLM05</td>
+<td>供应链漏洞</td>
+<td>LLM 应用程序生命周期可能会受到易受攻击的组件或服务的影响，从而导致安全攻击。使用第三方数据集、预先训练的模型和插件可能会增加漏洞。</td>
+</tr>
+<tr>
+<td>LLM06</td>
+<td>敏感信息披露</td>
+<td>LLM 可能会在其回复中泄露机密数据，从而导致未经授权的数据访问、隐私侵犯和安全漏洞。实施数据清理和严格的用户策略来缓解这种情况至关重要。</td>
+</tr>
+<tr>
+<td>LLM07</td>
+<td>不安全的插件设计</td>
+<td>LLM 插件可能具有不安全的输入和不足的访问控制。缺乏应用程序控制使它们更容易被利用，并可能导致远程代码执行等后果。</td>
+</tr>
+<tr>
+<td>LLM08</td>
+<td>过度代理</td>
+<td>基于 LLM 的系统可能会采取导致意想不到的后果的行动。该问题源于授予基于 LLM 的系统过多的功能、权限或自主权。</td>
+</tr>
+<tr>
+<td>LLM09</td>
+<td>过度依赖</td>
+<td>过度依赖 LLM 而不受监督的系统或人员可能会因 LLM 生成的不正确或不适当的内容而面临错误信息、沟通不畅、法律问题和安全漏洞。</td>
+</tr>
+<tr>
+<td>LLM10</td>
+<td>模型盗窃</td>
+<td>这涉及对专有 LLM 模型的未经授权的访问、复制或泄露。影响包括经济损失、竞争优势受损以及敏感信息的潜在访问。</td>
+</tr>
+</tbody></table>
+<h2 id="0x02-云原生人工智能（CNAI）"><a href="#0x02-云原生人工智能（CNAI）" class="headerlink" title="0x02 云原生人工智能（CNAI）"></a>0x02 云原生人工智能（CNAI）</h2><p>与人工智能一样，云原生作为当今最关键的技术趋势，也为应用程序的运行提供了可扩展且可靠的平台，正稳步成为主要的云工作负载。2024 年 3 月 19 日，CNCF 发布了<a target="_blank" rel="noopener" href="https://www.cncf.io/reports/cloud-native-artificial-intelligence-whitepaper/" title="《Cloud Native Artificial Intelligence Whitepaper》">《Cloud Native Artificial Intelligence Whitepaper》</a>（云原生人工智能白皮书），介绍了当今最先进的 AI&#x2F;ML（artificial intelligence and machine learning，人工智能和机器学习）技术，帮助工程师和业务成员了解不断变化的云原生人工智能生态系统及其机遇。</p>
+<p><img src="/image/image_z6qn7bZI8w.png" srcset="/img/loading.gif" lazyload alt="图 1：cloud native AI" title="图1：cloud native AI"></p>
+<p>云原生人工智能（CNAI，Cloud Native Artificial Intelligence）技术使得构建、部署、运行和扩展 AI 应用变得更加高效和实用。这项技术解决了 AI 应用开发者和科学家在云平台上面临的一系列挑战，包括开发、部署、运行、扩展和监控 AI 工作负载等方面。通过充分利用云基础设施的计算资源（如 CPU 和 GPU）、网络和存储能力，并结合有效的资源隔离和共享机制，CNAI 技术显著提升了 AI 应用的性能，并有助于降低运营成本。</p>
+<p><img src="/image/image_hadc0WRcug.png" srcset="/img/loading.gif" lazyload alt="图 2：相关技术和技能" title="图2：相关技术和技能"></p>
+<p>不仅如此，云原生对于人工智能的价值在云服务提供商和（或）人工智能公司发布的文章中得以体现，例如：</p>
+<ul>
+<li>2023 年 5 月 24 日，<a target="_blank" rel="noopener" href="https://huggingface.co/blog/hugging-face-endpoints-on-azure" title="Hugging Face 与微软合作在 Azure 上推出 Hugging Face 模型目录">Hugging Face 与微软合作在 Azure 上推出 Hugging Face 模型目录</a>；</li>
+<li>2016 年 8 月 29 日，OpenAI 发表了一篇名为<a target="_blank" rel="noopener" href="https://openai.com/index/infrastructure-for-deep-learning/" title="《Infrastructure for deep learning》">《Infrastructure for deep learning》</a>的文章。在这篇文章中，OpenAI 揭示了他们将<a target="_blank" rel="noopener" href="https://github.com/openai/kubernetes-ec2-autoscaler" title="kubernetes-ec2-autoscaler">kubernetes-ec2-autoscaler</a>作为 Kubernetes 上的普通的 pod 运行，对集群进行批量优化；</li>
+<li>2018 年 1 月 18 日，OpenAI 宣布他们已经<a target="_blank" rel="noopener" href="https://openai.com/index/scaling-kubernetes-to-2500-nodes/" title="将Kubernetes 扩展到2500个节点">将 Kubernetes 扩展到 2500 个节点</a>了；</li>
+<li>2021 年 1 月 25 日，OpenAI 再次宣布他们已将<a target="_blank" rel="noopener" href="https://openai.com/index/scaling-kubernetes-to-7500-nodes/" title="Kubernetes 集群扩展到7500个节点">Kubernetes 集群扩展到 7500 个节点</a>，可为<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.14165" title="GPT-3">GPT-3</a>、<a target="_blank" rel="noopener" href="https://openai.com/index/clip/" title="CLIP">CLIP</a> 和<a target="_blank" rel="noopener" href="https://openai.com/index/dall-e/" title="DALL·E">DALL·E</a>大模型提供一个可扩展的基础设置，同时也适用于快速的小规模迭代研究（例如<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2001.08361" title="神经语言模型的扩展法则">神经语言模型的扩展法则</a>）</li>
+<li>……</li>
+</ul>
+<p>OpenAI 最大规模的工作负载是直接管理的裸云虚拟机，而 Kubernetes 由于快速的迭代周期、合理的可扩展性以及几乎不用写样板代码的特性，成为了 OpenAI 团队大多数实验的理想选择。接下来，我们以 OpenAI 团队的 LLM 基础设施实践作为案例，介绍当前 LLM 算力结构和应用架构。</p>
+<h3 id="2-1-高效资源调度与弹性扩展"><a href="#2-1-高效资源调度与弹性扩展" class="headerlink" title="2.1 高效资源调度与弹性扩展"></a>2.1 高效资源调度与弹性扩展</h3><p>云原生平台以其灵活的调度能力，能够迅速响应计算资源的需求，实现资源的弹性扩展与收缩。这一特性对于执行大型机器学习任务尤为重要，因为这些任务在全面利用每个节点的硬件资源时，能够达到最优的运行效率。</p>
+<p>OpenAI 团队借助<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/" title="kube-scheduler">kube-scheduler</a>的动态调度功能，有效提升了资源利用率和运行效率。这种调度方式使得 GPU 之间能够通过<a target="_blank" rel="noopener" href="https://www.nvidia.com/en-us/data-center/nvlink/" title="NVLink">NVLink</a>实现直接的交叉通信，同时也能通过<a target="_blank" rel="noopener" href="https://developer.nvidia.com/gpudirect" title="GPUDirect">GPUDirect</a>技术与 NIC 进行直接通信。</p>
+<p>在 OpenAI 的众多工作负载中，常见做法是一个 pod 独占整个节点，从而避免了 NUMA、CPU 或 PCIE 资源竞争的问题。此外，OpenAI 集群拥有的完整对分带宽，无需担忧机架或网络拓扑的限制。</p>
+<p>得益于这些优化措施，即使管理着众多节点，调度器的压力也相对较轻。不过，需要注意的是，kube-scheduler 的压力具有突发性，新作业的启动可能会引发数百个 pod 的即时创建，但随后资源的变动率会迅速降低。</p>
+<p><img src="/image/image_HhWxWR0KgO.png" srcset="/img/loading.gif" lazyload alt="图 3：OpenAI 的 kube-scheduler 的调度压力" title="图3：OpenAI 的 kube-scheduler 的调度压力"></p>
+<h3 id="2-2-容器化与微服务架构"><a href="#2-2-容器化与微服务架构" class="headerlink" title="2.2 容器化与微服务架构"></a>2.2 容器化与微服务架构</h3><p>通过容器化技术，人们可以将 AI 应用和模型打包为独立的容器，使其具备良好的可移植性和可部署性。OpenAI 的 Kubernetes 要求每个作业都是一个 Docker 容器，以具备以来隔离和代码快照的能力，使 AI 算力可以在不同的环境中运行。</p>
+<p>然而，构建一个新的 Docker 容器可能会为研究人员的迭代周期增加宝贵的额外秒数，因此 OpenAI 团队还提供工具，将代码透明地从研究人员的笔记本电脑传输到标准镜像中。此外，微服务结构将应用拆分为多个独立的微服务。每个微服务负责特定的功能，使得 LLM 的开发和维护变得更加简单和灵活。</p>
+<p><img src="/image/image_S0WY3twU1K.png" srcset="/img/loading.gif" lazyload alt="图 4：TensorBoard 中的模型学习曲线" title="图4：TensorBoard 中的模型学习曲线"></p>
+<h3 id="2-3-云原生基础设施转型"><a href="#2-3-云原生基础设施转型" class="headerlink" title="2.3 云原生基础设施转型"></a>2.3 云原生基础设施转型</h3><p>在探讨理想的批处理作业性能时，OpenAI 团队注意到，虽然将集群中的节点数量加倍理论上能使作业运行时间减半，但在深度学习中，尤其是大型语言模型（LLM）的运算中，使用多 GPU 往往只能带来<a target="_blank" rel="noopener" href="https://research.googleblog.com/2016/04/announcing-tensorflow-08-now-with.html" title="非常次线性">非常次线性</a>的加速效果。因此，为了实现顶级性能，他们不仅依赖于顶级的 GPU，还注重于 LLM 基础设施的云原生化。</p>
+<p>OpenAI 团队在处理 CPU 密集型任务，如运行<a target="_blank" rel="noopener" href="https://gym.openai.com/envs#box2d" title="模拟器">模拟器</a>、<a target="_blank" rel="noopener" href="https://gym.openai.com/envs#atari" title="强化学习环境或小规模模型">强化学习环境或小规模模型</a>时，大量使用了 CPU 资源。这些任务在 GPU 上的运行速度并不更快，因此云原生化基础设施的灵活性和可扩展性在这里显得尤为重要。</p>
+<p><img src="https://images.ctfassets.net/kftzwdyauwt9/fc705186-3c3d-40eb-a2f96b4d94d5/6f3d0e0703333fd51f9719225cea0632/infra_img_3.png?w=3840&q=90&fm=webp" srcset="/img/loading.gif" lazyload alt="图 5：nvidia-smi 显示满载的 Titan Xs" title="图5：nvidia-smi 显示满载的 Titan Xs"></p>
+<p>得益于<a target="_blank" rel="noopener" href="https://aws.amazon.com/" title="AWS">AWS</a> 慷慨捐赠的大量计算资源，OpenAI 团队得以在云原生基础设施中运行 CPU 实例，并横向扩展 GPU 作业。此外，团队也运行着自己的物理服务器，主要配备 <a target="_blank" rel="noopener" href="http://www.geforce.com/hardware/10series/titan-x-pascal" title="Titan X">Titan X</a> GPU，这些服务器与云资源无缝集成，共同构成了一个云原生化的混合云架构。</p>
+<p><img src="https://images.ctfassets.net/kftzwdyauwt9/a52d26e1-f8c2-4ffa-7f4eff0762f5/5326f78c72a04f09816a670ec4dbfc05/infra_img_4.png?w=3840&q=90&fm=webp" srcset="/img/loading.gif" lazyload alt="图 6：同一台物理机器上运行的 htop 显示有大量的空闲 CPU" title="图6： 同一台物理机器上运行的 htop 显示有大量的空闲 CPU"></p>
+<p>OpenAI 团队长期采用混合云架构，这不仅是因为他们需要尝试不同的 GPU、互连和其他可能对深度学习未来重要的技术，而且还因为他们认识到，基础设施的云原生化对于提供简洁、一致的管理界面至关重要。他们使用 <a target="_blank" rel="noopener" href="https://www.terraform.io/" title="Terraform">Terraform</a>来设置 AWS 云资源，确保了云原生基础设施的自动化和一致性。</p>
+<p><img src="https://images.ctfassets.net/kftzwdyauwt9/d402e835-f111-40e6-28379f980e29/9914c96270cca97d124bee3faba1a0c9/infra_img_5.png?w=1200&q=90&fm=webp" srcset="/img/loading.gif" lazyload alt="图 7：OpenAI 的部分 Terraform 配置片段，用于管理自动伸缩" title="图7：OpenAI 的部分 Terraform配置片段，用于管理自动伸缩"></p>
+<p>OpenAI 的 LLM 基础设施云原生化体现在他们对 Kubernetes 的使用上，它不仅作为物理机和 AWS 节点的集群调度程序，而且还允许研究人员通过 Kubernetes 的 flannel 网络无缝访问他们正在运行的作业网络。这种架构的灵活性使得无论是小规模还是大规模的作业，都能在云原生化的基础设施中得到有效支持。</p>
+<p><img src="/image/image_-XX-bnC7gr.png" srcset="/img/loading.gif" lazyload alt="图 8：OpenAI 团队的 Kubernetes 集群的启动配置" title="图8：OpenAI 团队的Kubernetes 集群的启动配置"></p>
+<h2 id="0x03-云原生场景下的-LLM-风险"><a href="#0x03-云原生场景下的-LLM-风险" class="headerlink" title="0x03 云原生场景下的 LLM 风险"></a>0x03 云原生场景下的 LLM 风险</h2><p>在向云原生场景过渡的过程中，LLM 面临多种风险，这些风险包括算力平台、算力网络、AI 应用以及左移风险。</p>
+<h3 id="3-1-算力平台风险"><a href="#3-1-算力平台风险" class="headerlink" title="3.1 算力平台风险"></a>3.1 算力平台风险</h3><p>算力平台风险是指在使用云计算等算力平台进行大型语言模型训练和推理时可能面临的一系列潜在威胁，包括算力环境逃逸、算力滥用和持久化后门等。</p>
+<h4 id="3-1-1-持久化后门"><a href="#3-1-1-持久化后门" class="headerlink" title="3.1.1 持久化后门"></a>3.1.1 持久化后门</h4><p>持久化后门指的是攻击者在云原生环境中植入的隐藏入口点，这些入口点可以在攻击者与受感染系统之间建立长期的、未经授权的通信渠道。在 AI 领域，持久化后门可能被植入到 LLM 模型中，使得攻击者能够在不被察觉的情况下远程访问、操纵或窃取模型数据。</p>
+<p>由于后门可能非常隐蔽，它们可能在很长时间内都未被检测到，从而允许攻击者持续地访问和利用受感染的 AI 服务。在云原生环境中，由于服务的动态性和复杂性，检测和防御持久化后门变得更加困难，需要采用持续的安全监控、代码审计和异常行为分析等手段。</p>
+<h4 id="3-1-2-算力滥用"><a href="#3-1-2-算力滥用" class="headerlink" title="3.1.2 算力滥用"></a>3.1.2 算力滥用</h4><p>算力滥用是指攻击者不正当地使用计算资源，以达到非法目的。例如：通过过度占用 LLM 的计算资源来进行恶意训练、执行非法推理任务或进行加密货币挖矿等行为。算力滥用不仅会导致云服务提供商的成本增加，还可能影响其他租户的服务质量，甚至可能导致整个云服务的性能下降。</p>
+<h4 id="3-1-3-算力环境逃逸"><a href="#3-1-3-算力环境逃逸" class="headerlink" title="3.1.3 算力环境逃逸"></a>3.1.3 算力环境逃逸</h4><p>在云原生环境中，攻击者利用软件漏洞、配置错误或不当的权限设置，从一个受限制的算力环境（如容器、虚拟机或沙箱）中逃逸出来，获得对底层主机或其他租户资源的未授权访问。例如：在 LLM 执行的过程中，攻击者通过某种方式突破运行时的限制，访问或控制其他容器或服务。</p>
+<p>2023 年 6 月 7 日到 6 月 14 日，<a target="_blank" rel="noopener" href="https://positive.security/" title="Positive Security">Positive Security</a>的安全工程师 <a target="_blank" rel="noopener" href="https://www.linkedin.com/in/lukas-euler-bba6a3139/?locale=en_US" title="Lukas Euler">Lukas Euler</a>在尝试使用<a target="_blank" rel="noopener" href="https://autogpt.net/" title="Auto-GPT">Auto-GPT</a>的时候，发现了不可靠的代码执行和 Docker 逃逸，后来他通过改进有效载荷以实现可靠的代码执行并确定 ANSI 控制序列注入，当他尝试寻找更可靠、更广泛的 ANSI 控制序列注入时，却未成功。</p>
+<p><img src="/image/image_h_73lzYCRU.png" srcset="/img/loading.gif" lazyload alt="图 9：Auto-GPT RCE 漏洞利用路径" title="图9：Auto-GPT RCE 漏洞利用路径"></p>
+<p><img src="/image/1111_Qe3IENqDi8.png" srcset="/img/loading.gif" lazyload alt="图 10：注入 ANSI 控制序列 \u001b[0;32m 以打印绿色" title="图 10：注入 ANSI 控制序列 \u001b[0;32m 以打印绿色"></p>
+<p>2023 年 7 月 11 日 Auto-GPT 团队修复了该漏洞并发布了 3 篇安全公告。</p>
+<p><img src="/image/image_27lSMotZPV.png" srcset="/img/loading.gif" lazyload alt="图 11：Auto-GPT 团队修复了该漏洞并发布了 3 篇安全公告" title="图 11： Auto-GPT 团队修复了该漏洞并发布了3篇安全公告"></p>
+<p>2023 年 7 月 13 日，NVD 给漏洞“<a target="_blank" rel="noopener" href="https://github.com/Significant-Gravitas/AutoGPT/security/advisories/GHSA-x5gj-2chr-4ch6" title="Docker escape when running from docker-compose.yml included in git repo">Docker escape when running from docker-compose.yml included in git repo</a>”颁布了编号 CVE-2023-37273，并将其威胁等级评为“高危”，该漏洞可以覆盖 docker-compose.yml 文件并进行滥用，在下次启动 Auto-GPT 时会获得主机系统的控制权限。</p>
+<p><img src="/image/image_-o8_fcifCo.png" srcset="/img/loading.gif" lazyload alt="图 12：CVE-2023-37273 漏洞" title="图 12：CVE-2023-37273 漏洞"></p>
+<p>同时，漏洞“<a target="_blank" rel="noopener" href="https://github.com/Significant-Gravitas/AutoGPT/security/advisories/GHSA-5h38-mgp9-rj5f" title="Python code execution sandbox escape in non-docker version">Python code execution sandbox escape in non-docker version</a>”被颁布了<a target="_blank" rel="noopener" href="https://nvd.nist.gov/vuln/detail/CVE-2023-37274" title="CVE-2023-37274">CVE-2023-37274</a>编号，该漏洞可以在运行 Auto-GPT 的主机上执行任意代码，进一步造成持久化攻击。</p>
+<p><img src="/image/image_PSswyBCAm1.png" srcset="/img/loading.gif" lazyload alt="图 13：CVE-2023-37274 漏洞" title="图 13：CVE-2023-37274 漏洞"></p>
+<h3 id="3-2-算力网络风险"><a href="#3-2-算力网络风险" class="headerlink" title="3.2 算力网络风险"></a>3.2 算力网络风险</h3><p>算力网络风险主要是指在云原生环境中，由于网络的开放性、复杂性以及资源共享的特性，导致 LLM 在处理大量数据时可能面临的安全威胁和风险。这包括横向攻击、跨租户算力调度和 DDoS 等方面威胁。</p>
+<h4 id="3-2-1-横向攻击"><a href="#3-2-1-横向攻击" class="headerlink" title="3.2.1 横向攻击"></a>3.2.1 横向攻击</h4><p>横向攻击是指攻击者在突破了 LLM 系统的某个点（例如，通过利用漏洞或泄露的凭据）之后，开始在云基础设施内部横向移动，以访问更多的资源、数据或服务。</p>
+<p>由于云原生架构通常涉及多个微服务和容器，这些服务之间可能有广泛的网络连接，攻击者可以利用这些连接来扩展其攻击范围。</p>
+<p>在 LLM 的上下文中，横向攻击可能导致攻击者访问敏感的模型数据、窃取训练数据、或者甚至篡改模型行为，从而对整个 AI 服务的可信度和安全性造成威胁。</p>
+<h4 id="3-2-2-跨租户算力调度"><a href="#3-2-2-跨租户算力调度" class="headerlink" title="3.2.2 跨租户算力调度"></a>3.2.2 跨租户算力调度</h4><p>跨租户算力调度是指攻击者通过利用云平台的安全漏洞或配置错误，能够在不同租户之间非法调度或访问计算资源。</p>
+<p>在 LLM 的应用场景中，这意味着攻击者可能能够访问其他租户的模型实例或计算资源，从而进行未授权的操作，如窃取模型参数、执行恶意训练任务或进行资源耗尽攻击。</p>
+<p>这种风险强调了在云环境中实施严格的安全隔离和资源管理策略的重要性，以防止租户之间的不当访问和资源滥用。</p>
+<h4 id="3-2-3-DDoS-攻击"><a href="#3-2-3-DDoS-攻击" class="headerlink" title="3.2.3 DDoS 攻击"></a>3.2.3 DDoS 攻击</h4><p>DDoS 攻击是指攻击者通过控制大量的僵尸网络或利用云服务的可扩展性，向目标 LLM 服务发送大量伪造的请求，目的是耗尽服务器的带宽、计算资源或 API 请求配额，从而使得合法用户无法访问服务。</p>
+<p>对于 LLM 来说，DDoS 攻击可能导致模型服务不可用，影响用户体验，甚至可能导致业务中断。在云原生环境中，由于云服务通常是高度动态和分布式的，防御 DDoS 攻击变得更加复杂，这需要采用多层次的安全策略和自动化的流量管理措施来减轻其影响。根据 OWASP 的描述，DDoS 对 LLM 应用造成了重大的威胁，因此任何 LLM 应用在开发过程中都必须解决这一威胁。</p>
+<p><img src="/image/image_vpnamQiLac.png" srcset="/img/loading.gif" lazyload alt="图 14：DDoS 的原理" title="图14：DDoS的原理"></p>
+<p>尽管拒绝服务攻击通常旨在超载系统资源，但它们也可能利用系统行为的其他方面，例如 API 限制。2023 年 8 月 31 日，<a target="_blank" rel="noopener" href="https://sourcegraph.com/blog/security-update-august-2023" title="Sourcegraph经历了一次安全事件">Sourcegraph 经历了一次安全事件</a>，攻击者使用泄露的管理员访问令牌来更改 API 速率限制，从而可能引发服务中断。</p>
+<p><a target="_blank" rel="noopener" href="https://sourcegraph.com/" title="sourcegraph">sourcegraph</a>通过其人工智能编码助手 Cody，为开发人员提供了直接在编辑器中快速搜索、编写和理解代码的能力。然而，这一事件凸显了在云原生环境下，即使是高度自动化的服务也面临着严峻的安全挑战。2023 年 8 月 30 日，sourcegraph 的安全团队发现 API 的使用量显著提升，并开始调查原因。</p>
+<p><img src="/image/image_dZ2JeiTKNC.png" srcset="/img/loading.gif" lazyload alt="图 15：sourcegraph 的安全团队发现 API 的使用量显著提升" title="图15：sourcegraph 的安全团队发现 API 的使用量显著提升"></p>
+<p>经过调查发现，在 7 月 14 日提交的代码时，站点管理员的访问令牌在拉取请求的过程中意外泄漏，攻击者在其公共的 Sourcegraph 实例中使用了泄漏的管理员访问 token，并利用该权限提高了用户的 API 速率限制。</p>
+<p>Sourcegraph 承诺免费提供 API 访问，吸引了大量用户创建账户并开始使用代理应用程序。这个应用程序及其使用说明在网络上迅速传播，产生了近 200 万次浏览。随着用户数量的激增，越来越多的人通过创建免费的 Sourcegraph.com 账户并添加访问令牌，非法访问 Sourcegraph API，导致了异常高的请求量，最终可能导致服务中断。这一事件不仅揭示了云原生环境下的安全风险，也强调了在开放网络中保护 API 的重要性。</p>
+<h3 id="3-3-AI-应用风险"><a href="#3-3-AI-应用风险" class="headerlink" title="3.3 AI 应用风险"></a>3.3 AI 应用风险</h3><p>AI 应用风险是指在人工智能系统，特别是 LLM 等 AI 应用中存在的潜在威胁和风险。这些风险包括传统攻击和 LLM API 滥用等方面。</p>
+<h4 id="3-3-1-传统攻击"><a href="#3-3-1-传统攻击" class="headerlink" title="3.3.1 传统攻击"></a>3.3.1 传统攻击</h4><p>传统攻击指的是在 AI 系统中利用已知的攻击手段，如注入恶意代码、利用软件漏洞等。</p>
+<p>2024 年 4 月 16 日，基于 TensorFlow 的 Keras 模型中的一个<a target="_blank" rel="noopener" href="https://kb.cert.org/vuls/id/253266" title="安全漏洞">安全漏洞</a>被纰漏，并被命名为<a target="_blank" rel="noopener" href="http://web.nvd.nist.gov/vuln/detail/CVE-2024-3660" title="CVE-2024-3660">CVE-2024-3660</a>。该漏洞存在于 2.13 版本之前的 Lambda 层中。利用这个漏洞，攻击者可以在构建 Keras 模型时注入任意代码。当加载和使用这些第三方模型时，可能会导致任意不受信任的代码在机器学习应用程序环境中以特权级别执行。</p>
+<p><img src="/image/image_zyv7v8V0zX.png" srcset="/img/loading.gif" lazyload alt="图 16：CVE-2024-3660 漏洞详情" title="图16：CVE-2024-3660 漏洞详情"></p>
+<p>攻击者可以使用此功能对热门模型进行木马病毒攻击，保存并重新分发，从而污染依赖 AI&#x2F;ML 应用程序的供应链。</p>
+<h4 id="3-3-2-LLM-API-滥用"><a href="#3-3-2-LLM-API-滥用" class="headerlink" title="3.3.2 LLM API 滥用"></a>3.3.2 LLM API 滥用</h4><p>LLM API 滥用是指攻击者利用大型语言模型的 API 接口进行非法操作或获取敏感信息。在云原生环境中，这种风险尤为突出。</p>
+<p>2024 年 5 月 6 日，Sysdig 威胁研究团队观察到的<a target="_blank" rel="noopener" href="https://sysdig.com/blog/llmjacking-stolen-cloud-credentials-used-in-new-ai-attack" title="LLMjacking攻击">LLMjacking 攻击</a>，就是利用窃取的云凭证针对云托管的大型语言模型服务发动的。这些凭证是从一个常见目标获得的，即运行易受攻击的 Laravel 版本 ( <a target="_blank" rel="noopener" href="https://nvd.nist.gov/vuln/detail/CVE-2021-3129" title="CVE-2021-3129">CVE-2021-3129</a> ) 的系统。</p>
+<p><img src="/image/Asset-33-2048x645_cc2rNxu0Ze.png" srcset="/img/loading.gif" lazyload alt="图 17：LLMjacking 的攻击原理" title="图17：LLMjacking 的攻击原理"></p>
+<p>在本次攻击中，攻击者通过在云环境中使用看似合法的 InvokeModel API  请求，巧妙地测试了访问边界，而不会立即触发警报。它不仅证实了对 LLM 的访问存在，还证实了这些服务处于活动状态。</p>
+<p>在这次攻击事件中，Anthropic 的本地 Claude (v2&#x2F;v3) LLM 模型成为攻击目标。如果未被发现，这种类型的攻击可能导致受害者每天花费超过 46,000 美元的 LLM 消费成本。Sysdig 研究人员发现，LLM 反向代理被用于提供对受感染账户的访问权限，这表明其存在经济动机。然而，另一个可能的动机是提取 LLM 训练数据。</p>
+<h3 id="3-4-左移风险"><a href="#3-4-左移风险" class="headerlink" title="3.4 左移风险"></a>3.4 左移风险</h3><p>在云原生场景下，左移（Shift Left）风险是指在软件开发和部署的早期阶段就存在的安全风险。对于 LLM 来说，左移风险通常涉及到在模型开发、训练、打包和部署过程中可能引入的安全风险。常见的风险有：</p>
+<h4 id="3-4-1-AI-应用镜像构建投毒"><a href="#3-4-1-AI-应用镜像构建投毒" class="headerlink" title="3.4.1 AI 应用镜像构建投毒"></a>3.4.1 AI 应用镜像构建投毒</h4><p>在云原生场景下，AI 应用的镜像构建过程是一个关键环节。所谓的镜像构建投毒，指的是在构建 AI 应用镜像时，恶意代码被悄悄植入到镜像中。这种风险可能导致训练数据和模型参数被窃取、LLM 的功能受到破坏甚至影响到应用的正常运行。</p>
+<h4 id="3-4-2-后门风险"><a href="#3-4-2-后门风险" class="headerlink" title="3.4.2 后门风险"></a>3.4.2 后门风险</h4><p>后门风险是指在 AI 应用镜像或软件包中植入隐藏的入口点，攻击者可以通过这些入口点远程控制受感染的系统。在云原生环境中，后门风险尤为严重。云环境中的服务通常是高度可扩展的，一旦后门被植入，攻击者可以迅速扩大攻击范围。由于云原生环境的动态性和复杂性，后门可能长时间不被发现。</p>
+<h4 id="3-4-3-恶意软件包"><a href="#3-4-3-恶意软件包" class="headerlink" title="3.4.3 恶意软件包"></a>3.4.3 恶意软件包</h4><p>在云原生环境中，开发者常常依赖第三方软件包来构建应用。攻击者可能会发布与常用软件包名称相似的恶意软件包，诱导开发者下载。</p>
+<p>2024 年 1 月 15 日，悬镜供应链安全实验室在<a target="_blank" rel="noopener" href="https://pypi.org/" title="Pypi">Pypi</a>官方仓库中发现了一起针对 AI 开发者的<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1424433" title="恶意软件包投毒事件">恶意软件包投毒事件</a>，攻击者通过包名错误拼写 (typo-squatting) 的攻击方式仿冒知名机器学习框架 tensorflow 的包名来实施攻击。投毒攻击目标锁定 AI 开发者，一旦恶意软件包被集成到 AI 应用中，攻击者可能通过这些软件包对整个供应链发起攻击。</p>
+<p><img src="/image/image_wAu9Cbbr9T.png" srcset="/img/loading.gif" lazyload alt="图 18:tensorflow 包" title="图18:tensorflow 包"></p>
+<p>截至目前，投毒者在 Pypi 仓库共发布 5 个不同版本的恶意包。python 开发者一旦通过 pip 命令下载或安装该投毒包（tensrflwo），则会触发执行 Py 组件包中的恶意后门代码，并最终导致开发者系统被攻击者远程控制。</p>
+<p><img src="/image/image_SjteD2YGef.png" srcset="/img/loading.gif" lazyload alt="图 19:tensrflwo 包的相关信息" title="图19:tensrflwo 包的相关信息"></p>
+<p>恶意 Py 包 tensrflwo 在 Pypi 官方仓库上的总下载量为 870 次。</p>
+<p><img src="/image/image_zJpJigCcL1.png" srcset="/img/loading.gif" lazyload alt="图 20:tensrflwo 包的下载次数" title="图20:tensrflwo 包的下载次数"></p>
+<p>该恶意 Py 包已从 Pypi 官方仓库下架，但通过国内主流 Pypi 镜像源 (清华大学、腾讯云等) 依旧可正常下载、安装该恶意包，因此潜在的受害者数量将会更多，尤其对于国内广大使用 tensorflow 深度学习框架的 AI 开发者来说，仍存在被恶意投毒攻击的风险。</p>
+<p><img src="/image/image_OAWnKFwWR8.png" srcset="/img/loading.gif" lazyload alt="图 21:国内 Pypi 镜像源仍然可正常下载该恶意软件包" title="图21:国内 Pypi 镜像源仍然可正常下载该恶意软件包"></p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>随着大型语言模型（LLM）在各个领域的应用日益增多，其安全性也日益成为关注的焦点。</p>
+<p>本文，我们简单介绍了 OWASP 所提供的十大 LLM 安全风险。因为云原生环境的开放性、复杂性和资源共享特性，这些风险在云原生场景下尤为突出，使得 LLM 在处理大量数据时可能面临的安全威胁和风险更加多样化。</p>
+<p>为了更好地保障 LLM 的安全性，我们需要从各个方面进行综合考虑。这包括但不限于加强算力平台的安全防护，提升算力网络的安全性，以及加强 AI 应用的安全措施。同时，也需要加强对 LLM 安全性的研究和了解，提高开发者和用户的安全意识，以及采取更加积极主动的安全措施，以应对云原生场景下 LLM 面临的各种风险。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%AE%89%E5%85%A8/" class="print-no-link">#云原生安全</a>
+      
+        <a href="/tags/LLM-%E5%AE%89%E5%85%A8/" class="print-no-link">#LLM 安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>云原生场景下的大模型应用风险</div>
+      <div>http://example.com/2024/08/16/云原生场景下的大模型应用风险/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/19/CVE-2024-7646%EF%BC%9AIngress-nginx%E6%B3%A8%E9%87%8A%E9%AA%8C%E8%AF%81%E7%BB%95%E8%BF%87%E3%80%90%E9%AB%98%E5%8D%B1%E3%80%91/" title="CVE-2024-7646：Ingress-nginx 注释验证绕过【高危】">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CVE-2024-7646：Ingress-nginx 注释验证绕过【高危】</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/07/09/%E5%B0%8F%E7%8C%AB%E5%92%AA%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85Docker%E3%80%81containerd%E3%80%81CRI-O-%E5%92%8C-runc-%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB/" title="小猫咪带你理清 Docker、containerd、CRI-O 和 runc 之间的区别">
+                        <span class="hidden-mobile">小猫咪带你理清 Docker、containerd、CRI-O 和 runc 之间的区别</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

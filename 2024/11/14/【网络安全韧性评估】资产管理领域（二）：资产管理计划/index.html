@@ -1,0 +1,761 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Yaney.jpg">
+  <link rel="icon" href="/img/lizi.svg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yaney">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在这一讲中，我们采用了 5W2H 的方法对资产管理的计划进行了解读。在开启资产管理计划之前，组织需要先完成准备工作。资产管理计划结束后，会需要有个输出内容。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【网络安全韧性评估】资产管理领域（二）：资产管理计划">
+<meta property="og:url" content="http://example.com/2024/11/14/%E3%80%90%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%9F%A7%E6%80%A7%E8%AF%84%E4%BC%B0%E3%80%91%E8%B5%84%E4%BA%A7%E7%AE%A1%E7%90%86%E9%A2%86%E5%9F%9F%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E8%B5%84%E4%BA%A7%E7%AE%A1%E7%90%86%E8%AE%A1%E5%88%92/index.html">
+<meta property="og:site_name" content="Yaney&#39;s Blog">
+<meta property="og:description" content="在这一讲中，我们采用了 5W2H 的方法对资产管理的计划进行了解读。在开启资产管理计划之前，组织需要先完成准备工作。资产管理计划结束后，会需要有个输出内容。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/649.png">
+<meta property="article:published_time" content="2024-11-13T16:01:58.000Z">
+<meta property="article:modified_time" content="2025-08-05T08:05:07.924Z">
+<meta property="article:author" content="Yaney">
+<meta property="article:tag" content="安全建设">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/649.png">
+  
+  
+  
+  <title>【网络安全韧性评估】资产管理领域（二）：资产管理计划 - Yaney&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"Bash"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Yaney&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/image/649.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【网络安全韧性评估】资产管理领域（二）：资产管理计划"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-14 00:01" pubdate>
+          2024年11月14日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          23 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【网络安全韧性评估】资产管理领域（二）：资产管理计划</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>在这一讲中，我们采用了 5W2H 的方法对资产管理的计划进行了解读。</p>
+<p><img src="/image/648.png" srcset="/img/loading.gif" lazyload alt="图 1:5W2H 分析法" title="图 1:5W2H 分析法"></p>
+<p><img src="/image/649.png" srcset="/img/loading.gif" lazyload alt="图 2：资产管理计划" title="图 2：资产管理计划"></p>
+<p>在开启资产管理计划之前，组织需要先完成准备工作。资产管理计划的主要内容如下所示。资产管理计划结束后，会需要有个输出内容。</p>
+<p><img src="/image/650.png" srcset="/img/loading.gif" lazyload alt="图 3：资产管理计划所包含的内容" title="图 3：资产管理计划所包含的内容"></p>
+<h2 id="0x01-准备工作"><a href="#0x01-准备工作" class="headerlink" title="0x01 准备工作"></a>0x01 准备工作</h2><p>下面清单总结了组织在开始制定资产管理计划之前需要完成的任务以及需要收集的信息。</p>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>范围声明</td>
+<td>本声明需要定义资产管理计划和方案需要解决的问题。资产管理至少应涵盖支持组织关键服务的所有资产。不确定从何处着手的组织应将重点放在最基本的服务和直接影响其使命的领域上。这种方法可以让组织首先解决风险最大的领域，并减轻其影响。如果您的组织参与过网络安全韧性评估，那么从网络安全韧性评估期间处理的关键服务开始可能会比较好。</td>
+</tr>
+<tr>
+<td>利益相关者名单</td>
+<td>利益相关者名单应与范围声明保持一致，并包括所有适当的内部和外部实体。潜在候选人包括： - 执行和高级管理层 - 业务线负责人，尤其是关键服务所有者 - 信息技术 - 法务 - 董事会 - 技术供应商 - 监管机构和审计员 - 合规人员</td>
+</tr>
+<tr>
+<td>管理支持</td>
+<td>高级管理层对建立资产管理程序和实施流程的支持</td>
+</tr>
+<tr>
+<td>对可接受的资产管理方法的理解和认可</td>
+<td>管理层对拟采用资产管理方法的接受，包括利益相关者对已识别的关键资产和服务可接受风险容忍度的期望。</td>
+</tr>
+<tr>
+<td>外部强加的资产管理要求。</td>
+<td>规定资产定义的强制性要求的监管要求；还包括其他需求，如服务水平协议要求。</td>
+</tr>
+<tr>
+<td>风险</td>
+<td>分类和优先级排序的风险列表。</td>
+</tr>
+<tr>
+<td>资产管理的责任分配</td>
+<td>资产管理工作职责描述，例如：执行所有权、决策、沟通、测试和中断风险管理：</td>
+</tr>
+<tr>
+<td>资产管理预算</td>
+<td>识别用于执行资产管理规划和实施的可用资金，包括： - 人员资源 - 工具（应用程序及相关硬件） - 第三方支持 - 用于纠正资产管理过程中识别出的问题的资金</td>
+</tr>
+</tbody></table>
+<h2 id="0x02-资产管理计划获得支持"><a href="#0x02-资产管理计划获得支持" class="headerlink" title="0x02 资产管理计划获得支持"></a>0x02 资产管理计划获得支持</h2><h3 id="2-1-为什么需要获得领导层的支持？"><a href="#2-1-为什么需要获得领导层的支持？" class="headerlink" title="2.1 为什么需要获得领导层的支持？"></a>2.1 为什么需要获得领导层的支持？</h3><p>获得管理层的支持对于确保资产管理计划的有效实施至关重要。</p>
+<p>自上而下的方法通常有助于组织的资产管理计划满足其韧性目标。</p>
+<h3 id="2-2-获得领导层的支持的目的是什么？"><a href="#2-2-获得领导层的支持的目的是什么？" class="headerlink" title="2.2 获得领导层的支持的目的是什么？"></a>2.2 获得领导层的支持的目的是什么？</h3><p>管理层可以通过<strong>提供适当的资金、监督和人员配置来支持资产管理计划</strong>。</p>
+<p>自上而下的方法还可以<strong>让资产管理的统一方法论能够跨越组织界限进行实施</strong>。</p>
+<h3 id="2-3-需要获取的领导层的支持程度是多少？"><a href="#2-3-需要获取的领导层的支持程度是多少？" class="headerlink" title="2.3 需要获取的领导层的支持程度是多少？"></a>2.3 需要获取的领导层的支持程度是多少？</h3><p>**所需的管理层支持程度取决于资产在组织中的位置。**对于涉及整个组织的资产管理计划，需要高级执行层的支持。像服务层面这样的较小规模的实施，可能只需要负责该特定服务的管理层的支持。</p>
+<p>例如，在一个电力公用事业组织中，若有四个业务单位分别提供发电、输电、配电和业务支持服务，那么每个业务单位都构成了该组织的一个服务层。</p>
+<p>若要为这些服务单独实施资产管理计划，那么支持应该来自各自业务单位的管理层；若要求所有的业务单位实施共同的资产管理计划，那么支持应该来自电力公用事业的资深管理层。</p>
+<h2 id="0x03-识别服务"><a href="#0x03-识别服务" class="headerlink" title="0x03 识别服务"></a>0x03 识别服务</h2><blockquote>
+<p>这里的服务指的是组织在履行职责或生产产品过程中，所进行的有限数量的活动。</p>
+</blockquote>
+<h3 id="3-1-为什么要识别服务？"><a href="#3-1-为什么要识别服务？" class="headerlink" title="3.1 为什么要识别服务？"></a>3.1 为什么要识别服务？</h3><p>在组织中识别资产可能是一项艰巨的任务，因此组织应首先识别其提供的服务。</p>
+<p>然后，<strong>组织可以通过梳理支持这些服务的资产来识别资产，并将资产整体划分为可管理的部分</strong>。</p>
+<h3 id="3-2-识别服务的信息来源有哪些？"><a href="#3-2-识别服务的信息来源有哪些？" class="headerlink" title="3.2 识别服务的信息来源有哪些？"></a>3.2 识别服务的信息来源有哪些？</h3><p>服务通常与特定的组织相对应，但服务可以在业务单位之间共享，并跨越组织界限。例如，大型组织的全球供应链将跨越许多组织界限。</p>
+<p><strong>确定组织服务可能有用信息的来源包括：</strong></p>
+<ul>
+<li><strong>战略计划</strong></li>
+<li><strong>商业计划</strong></li>
+<li><strong>合同</strong></li>
+<li><strong>客户请求</strong></li>
+<li><strong>标准工作流程</strong></li>
+</ul>
+<p>**服务可以是面向外部，也可以是面向内部的。**面向外部的服务通常是面向客户的，而且通常是容易识别的服务，因为它们涉及已知的商品。为了实现外部服务的使命，组织还应该考虑其内部服务，例如：招聘流程、绩效评估和培训计划等。</p>
+<p><img src="/image/651.png" srcset="/img/loading.gif" lazyload alt="表 2：不同的关键基础设施和他们可能提供的关键服务" title="表 2：不同的关键基础设施和他们可能提供的关键服务"></p>
+<blockquote>
+<p>内部服务：指组织内部各部门、团队和流程等提供的支持性服务，这些服务不直接面向外部客户，而是用于帮助组织内部的其他单位有效地运作，以便实现组织的整体目标和使命。</p>
+<p>外部服务：指那些直接面向客户的服务，它们通常专注于组织生产或提供的具体产品，目的是满足外部客户的需求，增强客户体验，并促进组织的市场表现和业务增长。</p>
+</blockquote>
+<h3 id="3-3-如何进行服务识别工作"><a href="#3-3-如何进行服务识别工作" class="headerlink" title="3.3 如何进行服务识别工作"></a>3.3 如何进行服务识别工作</h3><p>为了方便服务的识别工作，组织应考虑<strong>使用一种文档记录方法来跟踪已识别的服务</strong>，例如：电子表格、配置控制的文档或数据库等。</p>
+<p><img src="/image/652.png" srcset="/img/loading.gif" lazyload alt="图 4：服务记录表格示例" title="图 4：服务记录表格示例"></p>
+<h2 id="0x04-对服务进行优先级排序"><a href="#0x04-对服务进行优先级排序" class="headerlink" title="0x04 对服务进行优先级排序"></a>0x04 对服务进行优先级排序</h2><h3 id="4-1-为什么要对服务进行优先级排序？"><a href="#4-1-为什么要对服务进行优先级排序？" class="headerlink" title="4.1 为什么要对服务进行优先级排序？"></a>4.1 为什么要对服务进行优先级排序？</h3><p>组织在识别了所提供的所有服务过后，应当对这些服务进行优先级排序，以确定高价值服务。这里的高价值服务指的是：对于组织完成其使命而言，至关重要的服务，一旦这些服务失败，可能会阻碍组织战略目标的实现。</p>
+<p><img src="/image/653.png" srcset="/img/loading.gif" lazyload alt="图 5：关键服务可能因流程失败或特定资产（如信息和技术）的失败而受到干扰" title="图 5：关键服务可能因流程失败或特定资产（如信息和技术）的失败而受到干扰"></p>
+<h3 id="4-2-对服务进行优先级排序应考虑的因素有哪些？"><a href="#4-2-对服务进行优先级排序应考虑的因素有哪些？" class="headerlink" title="4.2 对服务进行优先级排序应考虑的因素有哪些？"></a>4.2 对服务进行优先级排序应考虑的因素有哪些？</h3><p>组织必须根据服务的优先级，来为服务分配价值。在优先级排序和价值分配时，组织应该考虑如下因素：</p>
+<ul>
+<li><strong>业务影响分析（business impacts analysis，简称 BIA）的结果</strong></li>
+<li><strong>服务或业务连续性计划</strong></li>
+<li><strong>在风险评估活动中识别的服务风险后果</strong></li>
+<li><strong>战略目标</strong></li>
+<li><strong>安全分类</strong></li>
+</ul>
+<h3 id="4-3-如何进行优先级排序工作"><a href="#4-3-如何进行优先级排序工作" class="headerlink" title="4.3 如何进行优先级排序工作"></a>4.3 如何进行优先级排序工作</h3><p>一旦组织对其服务进行了优先级排序工作，就应该<strong>使用之前选择的文档工具来记录这些信息</strong>。</p>
+<p>然后，<strong>按照比例为其最重要的服务分配资源和预算</strong>，以进行资产识别等韧性活动。</p>
+<h2 id="0x05-建立一个通用的资产的定义"><a href="#0x05-建立一个通用的资产的定义" class="headerlink" title="0x05 建立一个通用的资产的定义"></a>0x05 建立一个通用的资产的定义</h2><p>组织在了解了实现其使命所需要的服务之后，需要定义为这些服务提供支持的资源。<strong>资源是服务运行所需要的原始材料，包括：人员、信息、技术和设施。</strong></p>
+<h3 id="5-1-人员"><a href="#5-1-人员" class="headerlink" title="5.1 人员"></a>5.1 人员</h3><p>**人员资产指的是对组织服务进行操作和监控的关键员工。**组织内部的人员（有时还包括外部人员）负责执行流程和程序，以确保服务能够实现组织的使命。</p>
+<p><img src="/image/654.png" srcset="/img/loading.gif" lazyload alt="表 3：内部和外部的人员资产示例" title="表 3：内部和外部的人员资产示例"></p>
+<p>在识别人员资产时，组织<strong>应考虑成功运营一项服务所必需的关键角色，而不是实际担任该角色的人</strong>。建议每个角色都包含一个明确列出的职能或责任清单，以履行该角色的职责。</p>
+<blockquote>
+<p>为每个角色定义职能将帮助组织确保人员具备足够的能力来执行该角色，并且可以有不止一个人来支持该角色。这也有助于在发现人员不足时识别培训需求。</p>
+</blockquote>
+<h3 id="5-2-信息"><a href="#5-2-信息" class="headerlink" title="5.2 信息"></a>5.2 信息</h3><p><strong>信息资产是指任何媒体上所需的、用于组织服务成功运行的信息或数据</strong>。信息资产也可以是服务的输出或副产品。</p>
+<p><img src="/image/655.png" srcset="/img/loading.gif" lazyload alt="表 4：信息资产的示例" title="表 4：信息资产的示例"></p>
+<p>信息可以是位或字节、文件或文档，也可以是存储在数据库中的集体信息。<strong>组织必须确定它希望定义信息资产的粒度</strong>。</p>
+<h3 id="5-3-技术"><a href="#5-3-技术" class="headerlink" title="5.3 技术"></a>5.3 技术</h3><h4 id="5-3-1-什么是技术资产"><a href="#5-3-1-什么是技术资产" class="headerlink" title="5.3.1 什么是技术资产"></a>5.3.1 什么是技术资产</h4><p><strong>技术资产包括软件、硬件、固件以及任何物理连接</strong>。</p>
+<h4 id="5-3-2-技术资产在哪里"><a href="#5-3-2-技术资产在哪里" class="headerlink" title="5.3.2 技术资产在哪里"></a>5.3.2 技术资产在哪里</h4><p>技术资产可以位于组织内的任何地方，由组织决定如何描述这些技术资产。</p>
+<h4 id="5-3-3-如何识别技术资产"><a href="#5-3-3-如何识别技术资产" class="headerlink" title="5.3.3 如何识别技术资产"></a>5.3.3 如何识别技术资产</h4><p>推荐从网络设备级别开始，在那里可以识别到常见的网络组件，如路由器、服务器和交换机。</p>
+<p>然后，继续识别个人计算设备，如台式电脑、笔记本电脑和平板电脑。</p>
+<h4 id="5-3-4-技术识别应该做到什么程度"><a href="#5-3-4-技术识别应该做到什么程度" class="headerlink" title="5.3.4 技术识别应该做到什么程度"></a>5.3.4 技术识别应该做到什么程度</h4><p>将设备归类到广泛的类别中，为组织提供了一个基础，使得组织能够在其基础设施中唯一地识别每一台设备。</p>
+<p>同时，这也为组织设定了管理的范围和控制边界，以便更有效地进行管理和维护。</p>
+<h3 id="5-4-设施"><a href="#5-4-设施" class="headerlink" title="5.4 设施"></a>5.4 设施</h3><p><strong>设施资产是指组织在提供或执行服务时所依赖的任何物理场所</strong>。设施可以由组织拥有和控制，也可以由外部业务伙伴控制。</p>
+<p><img src="/image/656.png" srcset="/img/loading.gif" lazyload alt="表 5：设施资产的示例" title="表 5：设施资产的示例"></p>
+<p>设施资产容纳了前面讨论的人员、技术以及信息资产，并且<strong>所有资产的保护策略必须进行整合</strong>。</p>
+<h2 id="0x06-输出内容"><a href="#0x06-输出内容" class="headerlink" title="0x06 输出内容"></a>0x06 输出内容</h2><table>
+<thead>
+<tr>
+<th>输出</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>服务优先级列表</td>
+<td>一个清晰的优先级列表，明确标识出价值最高的服务。</td>
+</tr>
+<tr>
+<td>资产定义</td>
+<td>组织的资产被明确定义，以便负责识别资产的利益相关者可以一致地记录它们。</td>
+</tr>
+</tbody></table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AE%89%E5%85%A8%E5%BB%BA%E8%AE%BE/" class="print-no-link">#安全建设</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【网络安全韧性评估】资产管理领域（二）：资产管理计划</div>
+      <div>http://example.com/2024/11/14/【网络安全韧性评估】资产管理领域（二）：资产管理计划/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Yaney</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/05/API-Server-%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E6%9C%8D%E5%8A%A1%EF%BC%88%E7%90%86%E8%AE%BA%E7%AF%87%EF%BC%89/" title="API Server 安全风险（一）：不安全的服务（理论篇）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">API Server 安全风险（一）：不安全的服务（理论篇）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/13/%E3%80%90%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%9F%A7%E6%80%A7%E8%AF%84%E4%BC%B0%E3%80%91%E8%B5%84%E4%BA%A7%E7%AE%A1%E7%90%86%E9%A2%86%E5%9F%9F%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E6%A6%82%E8%BF%B0/" title="【网络安全韧性评估】资产管理领域（一）：概述">
+                        <span class="hidden-mobile">【网络安全韧性评估】资产管理领域（一）：概述</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
